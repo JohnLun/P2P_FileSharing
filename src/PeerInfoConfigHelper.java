@@ -10,7 +10,7 @@ import java.util.Vector;
 
 public class PeerInfoConfigHelper {
     HashMap<Integer, Peer> mapOfPeers;
-    Vector<Integer> listOfPeers;
+    Vector<Peer> listOfPeers;
     private String fileName;
 
     public PeerInfoConfigHelper(String fileName) {
@@ -31,8 +31,9 @@ public class PeerInfoConfigHelper {
                 int port = Integer.getInteger(splitLine[2]);
                 int tmpBool = Integer.getInteger(splitLine[3]);
                 boolean hasFile = (tmpBool == 1);
-                mapOfPeers.put(peerId, new Peer(peerId, hostName, port, hasFile));
-                listOfPeers.add(peerId);
+                Peer p = new Peer(peerId, hostName, port, hasFile);
+                mapOfPeers.put(peerId, p);
+                listOfPeers.add(p);
 
                 line = reader.readLine();
             }
@@ -45,7 +46,7 @@ public class PeerInfoConfigHelper {
         return this.mapOfPeers;
     }
 
-    public Vector<Integer> getListOfPeers() {
+    public Vector<Peer> getListOfPeers() {
         return this.listOfPeers;
     }
 

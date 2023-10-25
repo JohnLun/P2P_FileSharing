@@ -19,7 +19,7 @@ public class Vitals {
     private int numPiecesInFile;
     private int numPiecesDownloaded;
     private ServerSocket listener;
-    private Vector<Integer> preferredNeighbors;
+    private Vector<Peer> preferredNeighbors;
 
     private PeerLogger peerLogger;
 
@@ -35,16 +35,16 @@ public class Vitals {
         this.peerInfoConfigHelper = peerInfoConfigHelper;
         this.listener = listener;
         this.initVitals();
-        preferredNeighbors = new Vector<Integer>();
+        preferredNeighbors = new Vector<Peer>();
     }
 
 
     public void createPreferredNeighbors() {
         int randomNum = 0;
-        Vector<Integer> listOfPeers = peerInfoConfigHelper.getListOfPeers();
+        Vector<Peer> listOfPeers = peerInfoConfigHelper.getListOfPeers();
         int k = commonConfigHelper.getNumPreferredNeighbors();
         for(int i = 0; i < k; i++) {
-            while(listOfPeers.get(randomNum) != this.peer.getPeerId()) {
+            while(listOfPeers.get(randomNum).getPeerId() != this.peer.getPeerId()) {
                 randomNum = ThreadLocalRandom.current().nextInt(0, listOfPeers.size());
             }
             this.preferredNeighbors.add(listOfPeers.get(randomNum));
@@ -85,7 +85,25 @@ public class Vitals {
         return this.peer;
     }
 
-    public Vector<Integer> getPreferredNeighbors() {
+    public Vector<Peer> getPreferredNeighbors() {
         return this.preferredNeighbors;
+    }
+
+    public Vector<Peer> getAllPeers() {
+        return peerInfoConfigHelper.getListOfPeers();
+    }
+
+    public BitSet getBitSet() {
+        return this.bitfield;
+    }
+
+    public byte[] convertToByteArr() {
+        byte[] temp = new byte[0];
+        return temp;
+    }
+
+    public byte[] convertToPiece(int index) {
+        byte[] temp = new byte[0];
+        return temp;
     }
 }
