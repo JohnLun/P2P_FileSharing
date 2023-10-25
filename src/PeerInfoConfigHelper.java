@@ -31,9 +31,9 @@ public class PeerInfoConfigHelper {
                 int port = Integer.getInteger(splitLine[2]);
                 int tmpBool = Integer.getInteger(splitLine[3]);
                 boolean hasFile = (tmpBool == 1);
-                Peer p = new Peer(peerId, hostName, port, hasFile);
-                mapOfPeers.put(peerId, p);
-                listOfPeers.add(p);
+                Peer newPeer = new Peer(peerId, hostName, port, hasFile);
+                mapOfPeers.put(peerId, newPeer);
+                listOfPeers.add(newPeer);
 
                 line = reader.readLine();
             }

@@ -1,4 +1,3 @@
-import com.sun.xml.internal.ws.api.message.Message;
 
 public class PeerWorker implements Runnable{
     private Vitals vitals;
@@ -27,6 +26,10 @@ public class PeerWorker implements Runnable{
     }
 
     public void sendHandshakeMessage() {
+
+    }
+
+    public void sendActualMessage() {
 
     }
 

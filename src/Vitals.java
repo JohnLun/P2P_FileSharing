@@ -81,6 +81,11 @@ public class Vitals {
         this.mapOfWorkers.put(neighborPeerId, peerWorker);
     }
 
+    // Adds sockets to hashmap as they are created
+    public void addSocketToMap(int neighborPeerId, Socket socket) {
+        this.mapOfSockets.put(neighborPeerId, socket);
+    }
+
     public Peer getPeer() {
         return this.peer;
     }
