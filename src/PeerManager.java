@@ -15,10 +15,12 @@ public class PeerManager {
         this.peerId = peerId;
         this.commonConfigHelper = new CommonConfigHelper("Common.cfg");
         this.peerInfoConfigHelper = new PeerInfoConfigHelper("PeerInfo.cfg");
-        this.initPeerManager();
     }
 
-    private void initPeerManager() {
+    public void run() {
+        this.executePeerManager();
+    }
+    private void executePeerManager() {
         try {
             this.listener = new ServerSocket(vitals.getPort(peerId));
             this.vitals = new Vitals(peerId, this.commonConfigHelper, this.peerInfoConfigHelper, this.listener);

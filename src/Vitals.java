@@ -2,6 +2,7 @@
 
 // This class will have all important information that will be used by the threads of the running process
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Vector;
@@ -14,6 +15,7 @@ public class Vitals {
     private CommonConfigHelper commonConfigHelper;
     private PeerInfoConfigHelper peerInfoConfigHelper;
     private HashMap<Integer, Peer> mapOfPeers;
+    private HashMap<Integer, Socket> mapOfSockets;
     private Peer peer;
     private BitSet bitfield;
     private int numPiecesInFile;
@@ -41,13 +43,13 @@ public class Vitals {
 
     public void createPreferredNeighbors() {
         int randomNum = 0;
-        Vector<Integer> listOfPeers = peerInfoConfigHelper.getListOfPeers();
+        Vector<Peer> listOfPeers = peerInfoConfigHelper.getListOfPeers();
         int k = commonConfigHelper.getNumPreferredNeighbors();
         for(int i = 0; i < k; i++) {
-            while(listOfPeers.get(randomNum) != this.peer.getPeerId()) {
+            while(listOfPeers.get(randomNum).getPeerId() != this.peer.getPeerId()) {
                 randomNum = ThreadLocalRandom.current().nextInt(0, listOfPeers.size());
             }
-            this.preferredNeighbors.add(listOfPeers.get(randomNum));
+            this.preferredNeighbors.add(listOfPeers.get(randomNum).getPeerId());
         }
     }
 
@@ -55,6 +57,7 @@ public class Vitals {
     private void initVitals() {
         this.numPiecesDownloaded = 0;
         this.mapOfPeers = peerInfoConfigHelper.getMapOfPeers();
+        this.mapOfSockets = new HashMap<>();
         this.peer = this.mapOfPeers.get(this.peerId);
         this.initBitField();
     }
@@ -81,6 +84,11 @@ public class Vitals {
         this.mapOfWorkers.put(neighborPeerId, peerWorker);
     }
 
+    // Adds sockets to hashmap as they are created
+    public void addSocketToMap(int neighborPeerId, Socket socket) {
+        this.mapOfSockets.put(neighborPeerId, socket);
+    }
+
     public Peer getPeer() {
         return this.peer;
     }
@@ -88,4 +96,9 @@ public class Vitals {
     public Vector<Integer> getPreferredNeighbors() {
         return this.preferredNeighbors;
     }
+
+    public Vector<Peer> getListOfPeers() {
+        return this.peerInfoConfigHelper.getListOfPeers();
+    }
+
 }
