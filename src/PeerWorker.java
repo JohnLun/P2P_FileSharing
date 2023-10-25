@@ -1,18 +1,22 @@
+import java.net.Socket;
 
 public class PeerWorker implements Runnable{
     private Vitals vitals;
+
+    private Socket socket;
     private PeerLogger logger;
     private Vitals receiverPeer;
     private boolean isSender;
 
-    public PeerWorker(Vitals vitals) {
+    public PeerWorker(Vitals vitals, Socket socket) {
         this.vitals = vitals;
         logger = new PeerLogger(this.vitals);
         this.isSender = false;
+        this.socket = socket;
     }
 
     public void init() {
-        for(Peer peer : vitals.getAllPeers()) {
+        for(Peer peer : vitals.getListOfPeers()) {
             peer.setChoked(false);
         }
     }

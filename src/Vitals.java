@@ -2,6 +2,7 @@
 
 // This class will have all important information that will be used by the threads of the running process
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Vector;
@@ -19,9 +20,13 @@ public class Vitals {
     private int numPiecesInFile;
     private int numPiecesDownloaded;
     private ServerSocket listener;
+
+    private HashMap<Integer, Socket> mapOfSockets;
     private Vector<Peer> preferredNeighbors;
 
     private PeerLogger peerLogger;
+
+
 
     // Map of PeerWorker threads, where the key is the Neighbor peerId
     // TODO: May need to be modified
@@ -56,6 +61,7 @@ public class Vitals {
         this.numPiecesDownloaded = 0;
         this.mapOfPeers = peerInfoConfigHelper.getMapOfPeers();
         this.peer = this.mapOfPeers.get(this.peerId);
+        this.mapOfSockets = new HashMap<Integer, Socket>();
         this.initBitField();
     }
 
@@ -94,7 +100,7 @@ public class Vitals {
         return this.preferredNeighbors;
     }
 
-    public Vector<Peer> getAllPeers() {
+    public Vector<Peer> getListOfPeers() {
         return peerInfoConfigHelper.getListOfPeers();
     }
 
