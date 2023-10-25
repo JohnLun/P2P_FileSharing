@@ -1,4 +1,6 @@
-
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 public class HandshakeMessage {
     private String handshakeHeader;
@@ -46,11 +48,22 @@ public class HandshakeMessage {
     }
 
     public byte[] writeHandshakeMessage() {
-        //TODO: Write method to generate handshake message
-        return getZeroBits();
+        ByteArrayOutputStream result = new ByteArrayOutputStream();
+        try {
+            result.write(this.handshakeHeader.getBytes(StandardCharsets.UTF_8));
+            result.write(this.zeroBits);
+            result.write(this.peerID);
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        return result.toByteArray();
     }
 
     public void readHandshakeMessage(byte[] message) {
-        //TODO: Write method to read handshake message
+        String readMsg = new String(message, StandardCharsets.UTF_8);
+        this.setHandshakeHeader(readMsg.substring(0, 18));
+        this.setZeroBits(readMsg.substring(18, 28).getBytes());
+        this.setPeerID(Integer.parseInt(readMsg.substring(28,32)));
     }
 }
