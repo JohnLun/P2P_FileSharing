@@ -48,7 +48,7 @@ public class MessageCreator {
         actualMessageAsBytes[4] = messageType;
 
         //Add message payload if it exists
-        if (messagePayload.length > 0) {
+        if (messagePayload != null || messagePayload.length > 0) {
             System.arraycopy(messagePayload, 0, actualMessageAsBytes, 5, messagePayload.length);
         }
 

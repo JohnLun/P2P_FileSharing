@@ -22,11 +22,20 @@ public class PeerManager {
     }
     private void executePeerManager() {
         try {
-            this.listener = new ServerSocket(vitals.getPort(peerId));
             this.vitals = new Vitals(peerId, this.commonConfigHelper, this.peerInfoConfigHelper, this.listener);
+            this.listener = new ServerSocket(this.vitals.getPort(this.peerId));
+            this.runPeerConnectionHandler();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    // Create and run peerConnectionHandler
+    // This thread makes connections with already existing peers and listens for future connections
+    private void runPeerConnectionHandler() {
+        PeerConnectionHandler peerConnectionHandler = new PeerConnectionHandler(this.peerId, listener, this.vitals);
+        Thread thread = new Thread(peerConnectionHandler);
+        thread.start();
     }
 
 }

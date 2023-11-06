@@ -48,6 +48,8 @@ public class CommonConfigHelper {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
         }
     }
 
