@@ -14,15 +14,18 @@ public class Vitals {
     private CommonConfigHelper commonConfigHelper;
     private PeerInfoConfigHelper peerInfoConfigHelper;
     private HashMap<Integer, Peer> mapOfPeers;
-    private HashMap<Integer, Socket> mapOfSockets;
     private Peer peer;
     private BitSet bitfield;
     private int numPiecesInFile;
     private int numPiecesDownloaded;
     private ServerSocket listener;
-    private Vector<Integer> preferredNeighbors;
+
+    private HashMap<Integer, Socket> mapOfSockets;
+    private Vector<Peer> preferredNeighbors;
 
     private PeerLogger peerLogger;
+
+
 
     // Map of PeerWorker threads, where the key is the Neighbor peerId
     // TODO: May need to be modified
@@ -36,15 +39,15 @@ public class Vitals {
         this.peerInfoConfigHelper = peerInfoConfigHelper;
         this.listener = listener;
         this.initVitals();
-        preferredNeighbors = new Vector<Integer>();
+        preferredNeighbors = new Vector<Peer>();
     }
 
     // Initiate basic vitals
     private void initVitals() {
         this.numPiecesDownloaded = 0;
         this.mapOfPeers = peerInfoConfigHelper.getMapOfPeers();
-        this.mapOfSockets = new HashMap<>();
         this.peer = this.mapOfPeers.get(this.peerId);
+        this.mapOfSockets = new HashMap<Integer, Socket>();
         this.initBitField();
     }
 
@@ -95,16 +98,25 @@ public class Vitals {
         return this.peerId;
     }
 
-    public Vector<Integer> getPreferredNeighbors() {
+    public Vector<Peer> getPreferredNeighbors() {
         return this.preferredNeighbors;
     }
 
     public Vector<Peer> getListOfPeers() {
-        return this.peerInfoConfigHelper.getListOfPeers();
+        return peerInfoConfigHelper.getListOfPeers();
     }
 
     public BitSet getBitSet() {
         return this.bitfield;
     }
 
+    public byte[] convertToByteArr() {
+        byte[] temp = new byte[0];
+        return temp;
+    }
+
+    public byte[] convertToPiece(int index) {
+        byte[] temp = new byte[0];
+        return temp;
+    }
 }

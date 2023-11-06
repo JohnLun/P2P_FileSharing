@@ -9,12 +9,8 @@ public class PeerWorker implements Runnable{
     private int peerId;
     private int neighborPeerId;
     private Socket socket;
-    private boolean isChoked;
-    private boolean isInterested;
     private PeerLogger logger;
-    private int receiverId;
     private boolean isInitiator;
-
     private ObjectInputStream in;
     private ObjectOutputStream out;
 
@@ -31,6 +27,10 @@ public class PeerWorker implements Runnable{
             e.printStackTrace();
         }
 
+    public void init() {
+        for(Peer peer : vitals.getListOfPeers()) {
+            peer.setChoked(false);
+        }
     }
 
     // Resolve the neighbor peer ID. If the neighbor is the client (ie this is the sender), the neighbor peer id will be passed in as an optional
@@ -88,25 +88,52 @@ public class PeerWorker implements Runnable{
     }
 
     public void sendInterestedMessage() {
-
+        byte[] message = MessageCreator.createActualMessage((byte)0x02, null);
     }
 
     public void sendNotInterestedMessage() {
-
+        byte[] message = MessageCreator.createActualMessage((byte)0x03, null);
     }
 
-    public void sendHaveMessage() {
-
+    public void sendHaveMessage(int index) {
+        byte[] message = MessageCreator.createActualMessage((byte)0x04, vitals.convertToPiece(index));
     }
 
     public void sendBitfieldMessage() {
+        if(!(vitals.getBitSet().isEmpty())) {
+            byte[] message = MessageCreator.createActualMessage((byte)0x05, vitals.convertToByteArr());
 
+        }
     }
     public void sendRequestMessage() {
 
     }
 
     public void sendPieceMessage() {
+        byte[] message = MessageCreator.createActualMessage((byte)0x07, vitals.convertToPiece(0));
+    }
 
+    public void checkIfHave() {
+        for(int i = 0; i < vitals.getBitSet().length(); i++) {
+            if(vitals.getBitSet().get(i) && !receiverPeer.getBitSet().get(i)) {
+                sendHaveMessage(i);
+                break;
+            }
+        }
+    }
+    public void checkMissingPieces() {
+        boolean foundMissingPiece = false;
+        for(int i = 0; i < vitals.getBitSet().length(); i++) {
+            if(!(vitals.getBitSet().get(i)) && receiverPeer.getBitSet().get(i)) {
+                vitals.getPeer().setInterested(true);
+                foundMissingPiece = true;
+                sendInterestedMessage();
+                break;
+            }
+        }
+
+        if(!foundMissingPiece) {
+            sendNotInterestedMessage();
+        }
     }
 }

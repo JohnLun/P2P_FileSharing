@@ -8,12 +8,18 @@ public class Peer {
     private int port;
     private boolean hasFile;
 
+    private boolean isInterested;
+
+    private boolean isChoked;
+
 
     public Peer(int peerId, String hostName, int port, boolean hasEntireFile) {
         this.peerId = peerId;
         this.hostName = hostName;
         this.port = port;
         this.hasFile = hasEntireFile;
+        this.isInterested = false;
+        this.isChoked = false;
     }
 
     public int getPeerId() {
@@ -27,5 +33,21 @@ public class Peer {
     }
     public boolean hasEntireFile() {
         return this.hasFile;
+    }
+
+    public boolean getInterested() {
+        return this.isInterested;
+    }
+
+    public boolean getChoked() {
+        return this.isChoked;
+    }
+
+    public void setInterested(boolean isInterested) {
+        this.isInterested = isInterested;
+    }
+
+    public void setChoked(boolean isChoked) {
+        this.isChoked = isChoked;
     }
 }

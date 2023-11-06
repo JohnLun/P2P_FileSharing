@@ -27,7 +27,7 @@ public class LoggerHelper {
     }
 
     // TODO: data structure for preferred neighbors may be changed
-    public String changePreferredNeighborsLog(Vector<Integer> preferredNeighbors) {
+    public String changePreferredNeighborsLog(Vector<Peer> preferredNeighbors) {
         String now = dtf.format(LocalDateTime.now());
         String commaSeparatedList = preferredNeighbors.toString();
 
