@@ -30,7 +30,10 @@ public class ActualMessage {
     }
 
     public ActualMessage(byte messageType, byte[] messagePayload) {
-        this.messageLength = this.messagePayload.length + 1;
+        if (messagePayload == null) {
+            messagePayload = new byte[0];
+        }
+        this.messageLength = messagePayload.length + 1;
         this.messageType = messageType;
         this.messagePayload = messagePayload;
     }

@@ -18,9 +18,9 @@ public class PeerManager {
     }
 
     public void run() {
-        this.executePeerManager();
+        this.runPeerManager();
     }
-    private void executePeerManager() {
+    private void runPeerManager() {
         try {
             this.vitals = new Vitals(peerId, this.commonConfigHelper, this.peerInfoConfigHelper, this.listener);
             this.listener = new ServerSocket(this.vitals.getPort(this.peerId));
