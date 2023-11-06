@@ -7,7 +7,6 @@ import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Vector;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.logging.SocketHandler;
 
 public class Vitals {
     //TODO: Add getters and setters to private vars
@@ -43,19 +42,6 @@ public class Vitals {
         preferredNeighbors = new Vector<Peer>();
     }
 
-
-    public void createPreferredNeighbors() {
-        int randomNum = 0;
-        Vector<Peer> listOfPeers = peerInfoConfigHelper.getListOfPeers();
-        int k = commonConfigHelper.getNumPreferredNeighbors();
-        for(int i = 0; i < k; i++) {
-            while(listOfPeers.get(randomNum).getPeerId() != this.peer.getPeerId()) {
-                randomNum = ThreadLocalRandom.current().nextInt(0, listOfPeers.size());
-            }
-            this.preferredNeighbors.add(listOfPeers.get(randomNum));
-        }
-    }
-
     // Initiate basic vitals
     private void initVitals() {
         this.numPiecesDownloaded = 0;
@@ -77,6 +63,18 @@ public class Vitals {
         }
     }
 
+    public void createPreferredNeighbors() {
+        int randomNum = 0;
+        Vector<Peer> listOfPeers = peerInfoConfigHelper.getListOfPeers();
+        int k = commonConfigHelper.getNumPreferredNeighbors();
+        for(int i = 0; i < k; i++) {
+            while(listOfPeers.get(randomNum).getPeerId() != this.peer.getPeerId()) {
+                randomNum = ThreadLocalRandom.current().nextInt(0, listOfPeers.size());
+            }
+            this.preferredNeighbors.add(listOfPeers.get(randomNum).getPeerId());
+        }
+    }
+
     // Get the port number of a specified peer
     public int getPort(int peerId) {
         return this.mapOfPeers.get(peerId).getPort();
@@ -92,8 +90,12 @@ public class Vitals {
         this.mapOfSockets.put(neighborPeerId, socket);
     }
 
-    public Peer getPeer() {
+    public Peer getThisPeer() {
         return this.peer;
+    }
+
+    public int getThisPeerId() {
+        return this.peerId;
     }
 
     public Vector<Peer> getPreferredNeighbors() {

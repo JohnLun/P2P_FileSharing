@@ -3,8 +3,6 @@
 import java.util.logging.Logger;
 import java.io.IOException;
 import java.util.logging.FileHandler;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 
 
 public class PeerLogger {
@@ -17,10 +15,10 @@ public class PeerLogger {
 
     public PeerLogger(Vitals vitals) {
         this.vitals = vitals;
-        loggerHelper = new LoggerHelper(vitals.getPeer().getPeerId());
-        logger = Logger.getLogger("log_peer_" + vitals.getPeer().getPeerId());
+        loggerHelper = new LoggerHelper(vitals.getThisPeer().getPeerId());
+        logger = Logger.getLogger("log_peer_" + vitals.getThisPeer().getPeerId());
         try {
-            fileHandler = new FileHandler("log_peer_" + vitals.getPeer().getPeerId() + ".log");
+            fileHandler = new FileHandler("log_peer_" + vitals.getThisPeer().getPeerId() + ".log");
             logger.addHandler(fileHandler);
         } catch (IOException e) {
             e.printStackTrace();
