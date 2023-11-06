@@ -26,6 +26,7 @@ public class PeerWorker implements Runnable{
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
     public void init() {
         for(Peer peer : vitals.getListOfPeers()) {
@@ -114,26 +115,27 @@ public class PeerWorker implements Runnable{
     }
 
     public void checkIfHave() {
-        for(int i = 0; i < vitals.getBitSet().length(); i++) {
-            if(vitals.getBitSet().get(i) && !receiverPeer.getBitSet().get(i)) {
-                sendHaveMessage(i);
-                break;
-            }
-        }
+//        for(int i = 0; i < vitals.getBitSet().length(); i++) {
+//            if(vitals.getBitSet().get(i) && !receiverPeer.getBitSet().get(i)) {
+//                sendHaveMessage(i);
+//                break;
+//            }
+//        }
     }
     public void checkMissingPieces() {
-        boolean foundMissingPiece = false;
-        for(int i = 0; i < vitals.getBitSet().length(); i++) {
-            if(!(vitals.getBitSet().get(i)) && receiverPeer.getBitSet().get(i)) {
-                vitals.getPeer().setInterested(true);
-                foundMissingPiece = true;
-                sendInterestedMessage();
-                break;
-            }
-        }
-
-        if(!foundMissingPiece) {
-            sendNotInterestedMessage();
-        }
+//        boolean foundMissingPiece = false;
+//        for(int i = 0; i < vitals.getBitSet().length(); i++) {
+//            if(!(vitals.getBitSet().get(i)) && receiverPeer.getBitSet().get(i)) {
+//                vitals.getThisPeer().setInterested(true);
+//                foundMissingPiece = true;
+//                sendInterestedMessage();
+//                break;
+//            }
+//        }
+//
+//        if(!foundMissingPiece) {
+//            sendNotInterestedMessage();
+//        }
     }
 }
+

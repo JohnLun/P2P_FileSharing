@@ -71,7 +71,7 @@ public class Vitals {
             while(listOfPeers.get(randomNum).getPeerId() != this.peer.getPeerId()) {
                 randomNum = ThreadLocalRandom.current().nextInt(0, listOfPeers.size());
             }
-            this.preferredNeighbors.add(listOfPeers.get(randomNum).getPeerId());
+            this.preferredNeighbors.add(listOfPeers.get(randomNum));
         }
     }
 
