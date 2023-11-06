@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.nio.ByteBuffer;
 import java.util.Optional;
 
 public class PeerWorker implements Runnable{
@@ -52,7 +53,7 @@ public class PeerWorker implements Runnable{
     }
 
     private void runPeerWorker() {
-
+        this.resolveHandshakes();
     }
 
     // If this peer is the initiator, send the handshake message and then wait for one back
@@ -89,29 +90,30 @@ public class PeerWorker implements Runnable{
     }
 
     public void sendInterestedMessage() {
-        byte[] message = MessageCreator.createActualMessage((byte)0x02, null);
+        this.sendActualMessage((byte)0x02, new byte[0]);
     }
 
     public void sendNotInterestedMessage() {
-        byte[] message = MessageCreator.createActualMessage((byte)0x03, null);
+        this.sendActualMessage((byte)0x03, new byte[0]);
     }
 
     public void sendHaveMessage(int index) {
-        byte[] message = MessageCreator.createActualMessage((byte)0x04, vitals.convertToPiece(index));
+        ByteBuffer b = ByteBuffer.allocate(4);
+        b.putInt(index);
+        byte[] indexAsBytes = b.array();
+        this.sendActualMessage((byte)0x04, indexAsBytes);
     }
 
     public void sendBitfieldMessage() {
-        if(!(vitals.getBitSet().isEmpty())) {
-            byte[] message = MessageCreator.createActualMessage((byte)0x05, vitals.convertToByteArr());
-
-        }
+        byte[] bitfield = vitals.getBitSet().toByteArray();
+        this.sendActualMessage((byte)0x05, bitfield);
     }
     public void sendRequestMessage() {
 
     }
 
     public void sendPieceMessage() {
-        byte[] message = MessageCreator.createActualMessage((byte)0x07, vitals.convertToPiece(0));
+        //byte[] message = MessageCreator.createActualMessage((byte)0x07, vitals.convertToPiece(0));
     }
 
     public void checkIfHave() {

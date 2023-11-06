@@ -109,14 +109,4 @@ public class Vitals {
     public BitSet getBitSet() {
         return this.bitfield;
     }
-
-    public byte[] convertToByteArr() {
-        byte[] temp = new byte[0];
-        return temp;
-    }
-
-    public byte[] convertToPiece(int index) {
-        byte[] temp = new byte[0];
-        return temp;
-    }
 }
