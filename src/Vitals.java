@@ -1,6 +1,9 @@
 
 
 // This class will have all important information that will be used by the threads of the running process
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.BitSet;
@@ -24,6 +27,7 @@ public class Vitals {
     private Vector<Peer> preferredNeighbors;
 
     private PeerLogger peerLogger;
+    private byte[] data;
 
 
 
@@ -38,21 +42,21 @@ public class Vitals {
         this.commonConfigHelper = commonConfigHelper;
         this.peerInfoConfigHelper = peerInfoConfigHelper;
         this.listener = listener;
-        this.initVitals();
         preferredNeighbors = new Vector<Peer>();
+        data = new byte[commonConfigHelper.getFileSize()];
+        this.initVitals();
     }
 
     // Initiate basic vitals
     private void initVitals() {
-        this.numPiecesDownloaded = 0;
         this.mapOfPeers = peerInfoConfigHelper.getMapOfPeers();
         this.peer = this.mapOfPeers.get(this.peerId);
         this.mapOfSockets = new HashMap<Integer, Socket>();
-        this.initBitField();
+        this.initBitFieldAndData();
     }
 
-    // Create bitfield for this peer
-    private void initBitField() {
+    // Create bitfield for this peer and the data array if this peer has the entire file
+    private void initBitFieldAndData() {
         this.numPiecesInFile = (int)Math.ceil((double)commonConfigHelper.getFileSize() / commonConfigHelper.getPieceSize());
         this.bitfield = new BitSet(this.numPiecesInFile);
 
@@ -60,6 +64,25 @@ public class Vitals {
         if (this.peer.hasEntireFile()) {
             this.bitfield.set(0, numPiecesInFile - 1, true);
             this.numPiecesDownloaded = this.numPiecesInFile;
+            
+            // If our peer has the entire file according to the config, read the file into our data array
+            this.readEntireFile(this.commonConfigHelper.getFileName());
+        }
+        else {
+            this.numPiecesDownloaded = 0;
+        }
+    }
+
+    // If a peer has the entire file, this function reads it
+    private void readEntireFile(String file) {
+        try {
+            FileInputStream inputStream = new FileInputStream(file);
+            inputStream.read(this.data);
+            inputStream.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

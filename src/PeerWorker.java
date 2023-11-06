@@ -82,11 +82,11 @@ public class PeerWorker implements Runnable{
     }
 
     public void sendChokeMessage() {
-
+        this.sendActualMessage((byte)0x00, new byte[0]);
     }
 
     public void sendUnchokeMessage() {
-
+        this.sendActualMessage((byte)0x01, new byte[0]);
     }
 
     public void sendInterestedMessage() {
