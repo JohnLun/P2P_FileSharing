@@ -1,5 +1,3 @@
-
-
 // This class will have all important information that will be used by the threads of the running process
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -64,7 +62,7 @@ public class Vitals {
         if (this.peer.hasEntireFile()) {
             this.bitfield.set(0, numPiecesInFile - 1, true);
             this.numPiecesDownloaded = this.numPiecesInFile;
-            
+
             // If our peer has the entire file according to the config, read the file into our data array
             this.readEntireFile(this.commonConfigHelper.getFileName());
         }
