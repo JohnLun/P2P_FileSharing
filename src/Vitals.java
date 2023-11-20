@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.ByteBuffer;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Vector;
@@ -119,6 +120,9 @@ public class Vitals {
         this.mapOfSockets.put(neighborPeerId, socket);
     }
 
+    public Peer getPeer(int peerId) {
+        return this.mapOfPeers.get(peerId);
+    }
     public Peer getThisPeer() {
         return this.peer;
     }
@@ -137,6 +141,63 @@ public class Vitals {
 
     public BitSet getBitSet() {
         return this.bitfield;
+    }
+    public int getNumPiecesInFile() {
+        return this.numPiecesInFile;
+    }
+    public int getNumPiecesDownloaded() {
+        return this.numPiecesDownloaded;
+    }
+
+    // This function returns an array with the first four bytes as the index and the rest as the piece data
+    public byte[] getPiecePayload(int index) {
+        // Get the actual piece
+        byte[] piece = this.getPiece(index);
+
+        // Convert the index to an int
+        ByteBuffer b = ByteBuffer.allocate(4);
+        b.putInt(index);
+        byte[] indexAsBytes = b.array();
+
+        // Create final return object
+        byte[] finalPayload = new byte[indexAsBytes.length + piece.length];
+
+        // Copy index and piece into final return object
+        System.arraycopy(indexAsBytes, 0, finalPayload, 0, 4);
+        System.arraycopy(piece, 0, finalPayload, 4, piece.length);
+
+        return finalPayload;
+    }
+    private byte[] getPiece(int index) {
+        // If the requested piece is the last piece in the file AND the last piece is smaller than a normal piece
+        if (index == this.numPiecesInFile - 1 &&
+                this.commonConfigHelper.getFileSize() % this.commonConfigHelper.getPieceSize() != 0) {
+            return this.getLastPiece(index);
+        }
+        else {
+            // Create an empty byte array of piece size and copy the piece over from this.data
+            byte[] piece = new byte[this.commonConfigHelper.getPieceSize()];
+            int startIndex = index * this.commonConfigHelper.getPieceSize();
+            System.arraycopy(this.data, startIndex, piece, 0, this.commonConfigHelper.getPieceSize());
+            return piece;
+        }
+    }
+
+    private byte[] getLastPiece(int index) {
+        // Get the length of the last piece
+        int lastPieceLength = this.commonConfigHelper.getFileSize() % this.commonConfigHelper.getPieceSize();
+
+        // Get the piece data
+        byte[] piece = new byte[lastPieceLength];
+        int startIndex = index * this.commonConfigHelper.getPieceSize();
+        System.arraycopy(this.data, startIndex, piece, 0, lastPieceLength);
+        return piece;
+    }
+
+    public void putPiece(int index, byte[] piece) {
+        this.numPiecesDownloaded = this.bitfield.cardinality();
+        int offset = index * this.commonConfigHelper.getPieceSize();
+        System.arraycopy(piece, 0, this.data, offset, piece.length);
     }
 
 }
