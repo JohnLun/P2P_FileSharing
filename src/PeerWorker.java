@@ -6,6 +6,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.BitSet;
 import java.util.Optional;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class PeerWorker implements Runnable{
     private final String HANDSHAKE_HEADER = "P2PFILESHARINGPROJ";
@@ -15,8 +16,13 @@ public class PeerWorker implements Runnable{
     private Socket socket;
     private PeerLogger logger;
     private boolean isInitiator;
+    private boolean isChoked;
+    private boolean neighborIsChoked;
+    private boolean isInterested;
+    private boolean neighborIsInterested;
     private ObjectInputStream in;
     private ObjectOutputStream out;
+    private BitSet neighborPiecesToChooseFrom;
 
     public PeerWorker(Vitals vitals, Socket socket, int peerId, Optional<Integer> neighborPeerIdOptional) {
         try {
@@ -177,40 +183,48 @@ public class PeerWorker implements Runnable{
     }
 
     public void sendChokeMessage() {
+        this.neighborIsChoked = true;
         this.sendActualMessage((byte)0x00, new byte[0]);
     }
 
+    // When this message is received, it means that the neighbor is choking this message.
     public void processChokeMessage(ActualMessage actualMessage) {
-        vitals.getThisPeer().setChoked(true);
+        this.isChoked = true;
         logger.choke(this.neighborPeerId);
 
     }
 
     public void sendUnchokeMessage() {
+        this.neighborIsChoked = false;
         this.sendActualMessage((byte)0x01, new byte[0]);
     }
 
+    // When this message is received, it means that the neighbor is unchoking this peer
     public void processUnchokeMessage(ActualMessage actualMessage) {
-        vitals.getThisPeer().setChoked(false);
+        this.isChoked = false;
         logger.unchoke(this.neighborPeerId);
-        checkMissingPieces();
+        this.sendRequestMessage();
     }
 
     public void sendInterestedMessage() {
+        this.isInterested = true;
         this.sendActualMessage((byte)0x02, new byte[0]);
     }
 
+    // When this message is received, it means that the neighbor is interested
     public void processInterestedMessage(ActualMessage actualMessage) {
-        vitals.getThisPeer().setInterested(true);
+        this.neighborIsInterested = true;
         logger.receiveInterested(this.neighborPeerId);
     }
 
     public void sendNotInterestedMessage() {
+        this.isInterested = false;
         this.sendActualMessage((byte)0x03, new byte[0]);
     }
 
+    // When this message is received, it means that the neighbor is not interested
     public void processNotInterestedMessage(ActualMessage actualMessage) {
-        vitals.getThisPeer().setInterested(false);
+        this.neighborIsInterested = false;
         logger.receiveNotInterested(this.neighborPeerId);
     }
 
@@ -223,8 +237,15 @@ public class PeerWorker implements Runnable{
 
     public void processHaveMessage(ActualMessage actualMessage) {
         int pieceIndex = ByteBuffer.wrap(actualMessage.getMessagePayload()).getInt();
-        vitals.getBitSet().set(pieceIndex);
+
+        // Update the pieces to choose from, since the neighbor is signalling that it has a new piece
+        this.neighborPiecesToChooseFrom.set(pieceIndex);
         vitals.getPeerLogger().receiveHave(this.neighborPeerId, pieceIndex);
+
+        // If this peer does not have the piece that the neighbor has, send an interested message
+        if (vitals.getBitSet().get(pieceIndex)) {
+            this.sendInterestedMessage();
+        }
     }
 
     public void sendBitfieldMessage() {
@@ -233,61 +254,95 @@ public class PeerWorker implements Runnable{
     }
 
     public void processBitFieldMessage(ActualMessage actualMessage) {
-        BitSet peerBitSet = BitSet.valueOf(actualMessage.getMessagePayload());
-        vitals.getBitSet().or(peerBitSet);
-        //vitals.getPeerLogger().logBitfield(this.neighborPeerId, peerBitSet);
-        //TODO: How to log Bitfield?
+        BitSet neighborBitSet = BitSet.valueOf(actualMessage.getMessagePayload());
+
+        // Get the difference of the neighbor bitset and our bitset
+        // the result is a bitset of the pieces we don't have
+        neighborBitSet.andNot(vitals.getBitSet());
+
+        // Set this variable for later use
+        this.neighborPiecesToChooseFrom = neighborBitSet;
+
+        // If the neighbor has pieces we don't, send interested message
+        if (neighborBitSet.cardinality() > 0) {
+            this.sendInterestedMessage();
+        }
+        else {
+            sendNotInterestedMessage();
+        }
     }
 
     public void sendRequestMessage() {
+        int index = this.chooseIndexForRequestMessage();
 
+        // If there are no pieces that this peer wants, send a not interested message
+        if (index == -1) {
+            this.sendNotInterestedMessage();
+            return;
+        }
+
+        // Set the piece here and not when the piece is received, so that other threads do not request the same piece
+        this.vitals.getBitSet().set(index);
+
+        ByteBuffer b = ByteBuffer.allocate(4);
+        b.putInt(index);
+        byte[] indexAsBytes = b.array();
+        this.sendActualMessage((byte)0x04, indexAsBytes);
+    }
+
+    private int chooseIndexForRequestMessage() {
+        // Refresh the pieces to choose from, since other threads may have updated our bitfield
+        this.neighborPiecesToChooseFrom.andNot(this.vitals.getBitSet());
+
+        // Get a random piece position
+        int randomPosition = ThreadLocalRandom.current().nextInt(0, this.vitals.getNumPiecesInFile());
+
+        // Get the closest piece index to our randomly generated position
+        int pieceIndex =  this.neighborPiecesToChooseFrom.nextSetBit(randomPosition);
+        if (pieceIndex == -1) {
+            pieceIndex = this.neighborPiecesToChooseFrom.previousSetBit(randomPosition);
+        }
+
+        return pieceIndex;
     }
 
     public void processRequestMessage(ActualMessage actualMessage) {
         int pieceIndex = ByteBuffer.wrap(actualMessage.getMessagePayload()).getInt();
         if (vitals.getBitSet().get(pieceIndex)) {
-            sendPieceMessage(pieceIndex);
+            this.sendPieceMessage(pieceIndex);
+        }
+        else {
+            throw new IllegalArgumentException("This peer received a request message for a piece that it does not have " +
+                    "from neighbor " + this.neighborPeerId);
         }
     }
 
     public void sendPieceMessage(int pieceIndex) {
-        //byte[] message = MessageCreator.createActualMessage((byte)0x07, vitals.convertToPiece(0));
-        //TODO: Implememt sendPieceMessage(int pieceIndex)
+        if (pieceIndex >= this.vitals.getNumPiecesInFile()) {
+            throw new IllegalArgumentException("The requested piece index to be sent is out of bounds.");
+        }
+        byte[] piecePayload = vitals.getPiecePayload(pieceIndex);
+        this.sendActualMessage((byte)0x07, piecePayload);
     }
 
     public void processPieceMessage(ActualMessage actualMessage) {
+        // Extract index and data from message
         ByteBuffer buffer = ByteBuffer.wrap(actualMessage.getMessagePayload());
         int pieceIndex = buffer.getInt();
         byte[] pieceData = new byte[buffer.remaining()];
         buffer.get(pieceData);
-        //vitals.updateDataStorage(pieceIndex, pieceData);
-        vitals.getBitSet().set(pieceIndex);
-        //vitals.getPeerLogger().downloadPiece(this.neighborPeerId, pieceIndex, vitals.getThisPeer().getNumPieces());
-        //TODO: create functions needed to keep track of number of pieces a peer has (and to update)
-    }
 
-    public void checkIfHave() {
-//        for(int i = 0; i < vitals.getBitSet().length(); i++) {
-//            if(vitals.getBitSet().get(i) && !receiverPeer.getBitSet().get(i)) {
-//                sendHaveMessage(i);
-//                break;
-//            }
-//        }
-    }
-    public void checkMissingPieces() {
-//        boolean foundMissingPiece = false;
-//        for(int i = 0; i < vitals.getBitSet().length(); i++) {
-//            if(!(vitals.getBitSet().get(i)) && receiverPeer.getBitSet().get(i)) {
-//                vitals.getThisPeer().setInterested(true);
-//                foundMissingPiece = true;
-//                sendInterestedMessage();
-//                break;
-//            }
-//        }
-//
-//        if(!foundMissingPiece) {
-//            sendNotInterestedMessage();
-//        }
+        if (pieceIndex >= this.vitals.getNumPiecesInFile()) {
+            throw new IllegalArgumentException("The received piece index is out of bounds.");
+        }
+
+        // Put data in vitals (and therefore this peer)
+        this.vitals.putPiece(pieceIndex, pieceData);
+
+        // Finally, request another piece if this peer is not choked and is interested
+        if (!this.isChoked && this.isInterested) {
+            this.sendRequestMessage();
+        }
     }
 }
 
