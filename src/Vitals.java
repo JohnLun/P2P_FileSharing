@@ -24,6 +24,14 @@ public class Vitals {
     private HashMap<Integer, Socket> mapOfSockets;
     private Vector<Peer> preferredNeighbors;
 
+    public PeerLogger getPeerLogger() {
+        return peerLogger;
+    }
+
+    public void setPeerLogger(PeerLogger peerLogger) {
+        this.peerLogger = peerLogger;
+    }
+
     private PeerLogger peerLogger;
     private byte[] data;
 
@@ -130,4 +138,5 @@ public class Vitals {
     public BitSet getBitSet() {
         return this.bitfield;
     }
+
 }

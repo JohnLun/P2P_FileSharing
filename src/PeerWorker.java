@@ -4,6 +4,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.BitSet;
 import java.util.Optional;
 
 public class PeerWorker implements Runnable{
@@ -180,6 +181,8 @@ public class PeerWorker implements Runnable{
     }
 
     public void processChokeMessage(ActualMessage actualMessage) {
+        vitals.getThisPeer().setChoked(true);
+        logger.choke(this.neighborPeerId);
 
     }
 
@@ -188,7 +191,9 @@ public class PeerWorker implements Runnable{
     }
 
     public void processUnchokeMessage(ActualMessage actualMessage) {
-
+        vitals.getThisPeer().setChoked(false);
+        logger.unchoke(this.neighborPeerId);
+        checkMissingPieces();
     }
 
     public void sendInterestedMessage() {
@@ -196,7 +201,8 @@ public class PeerWorker implements Runnable{
     }
 
     public void processInterestedMessage(ActualMessage actualMessage) {
-
+        vitals.getThisPeer().setInterested(true);
+        logger.receiveInterested(this.neighborPeerId);
     }
 
     public void sendNotInterestedMessage() {
@@ -204,7 +210,8 @@ public class PeerWorker implements Runnable{
     }
 
     public void processNotInterestedMessage(ActualMessage actualMessage) {
-
+        vitals.getThisPeer().setInterested(false);
+        logger.receiveNotInterested(this.neighborPeerId);
     }
 
     public void sendHaveMessage(int index) {
@@ -215,7 +222,9 @@ public class PeerWorker implements Runnable{
     }
 
     public void processHaveMessage(ActualMessage actualMessage) {
-
+        int pieceIndex = ByteBuffer.wrap(actualMessage.getMessagePayload()).getInt();
+        vitals.getBitSet().set(pieceIndex);
+        vitals.getPeerLogger().receiveHave(this.neighborPeerId, pieceIndex);
     }
 
     public void sendBitfieldMessage() {
@@ -224,7 +233,10 @@ public class PeerWorker implements Runnable{
     }
 
     public void processBitFieldMessage(ActualMessage actualMessage) {
-
+        BitSet peerBitSet = BitSet.valueOf(actualMessage.getMessagePayload());
+        vitals.getBitSet().or(peerBitSet);
+        //vitals.getPeerLogger().logBitfield(this.neighborPeerId, peerBitSet);
+        //TODO: How to log Bitfield?
     }
 
     public void sendRequestMessage() {
@@ -232,15 +244,26 @@ public class PeerWorker implements Runnable{
     }
 
     public void processRequestMessage(ActualMessage actualMessage) {
-
+        int pieceIndex = ByteBuffer.wrap(actualMessage.getMessagePayload()).getInt();
+        if (vitals.getBitSet().get(pieceIndex)) {
+            sendPieceMessage(pieceIndex);
+        }
     }
 
-    public void sendPieceMessage() {
+    public void sendPieceMessage(int pieceIndex) {
         //byte[] message = MessageCreator.createActualMessage((byte)0x07, vitals.convertToPiece(0));
+        //TODO: Implememt sendPieceMessage(int pieceIndex)
     }
 
     public void processPieceMessage(ActualMessage actualMessage) {
-
+        ByteBuffer buffer = ByteBuffer.wrap(actualMessage.getMessagePayload());
+        int pieceIndex = buffer.getInt();
+        byte[] pieceData = new byte[buffer.remaining()];
+        buffer.get(pieceData);
+        //vitals.updateDataStorage(pieceIndex, pieceData);
+        vitals.getBitSet().set(pieceIndex);
+        //vitals.getPeerLogger().downloadPiece(this.neighborPeerId, pieceIndex, vitals.getThisPeer().getNumPieces());
+        //TODO: create functions needed to keep track of number of pieces a peer has (and to update)
     }
 
     public void checkIfHave() {
