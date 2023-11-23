@@ -200,4 +200,21 @@ public class Vitals {
         System.arraycopy(piece, 0, this.data, offset, piece.length);
     }
 
+    public int getNumPreferredNeighbors() {
+        return this.commonConfigHelper.getNumPreferredNeighbors();
+    }
+
+    public int getUnchokingInterval() {
+        return this.commonConfigHelper.getUnchokingInterval();
+    }
+
+    public int getOptimisticallyUnchokedInterval() {
+        return this.commonConfigHelper.getOptimisticUnchokingInterval();
+    }
+
+    public HashMap<Integer, PeerWorker> getMapOfWorkers() {
+        return this.mapOfWorkers;
+    }
+
+
 }
