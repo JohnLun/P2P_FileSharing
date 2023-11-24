@@ -8,10 +8,12 @@ import java.util.Vector;
 public class PeerConnectionHandler implements Runnable{
     private int peerId;
     private ServerSocket listener;
+    private PeerManager peerManager;
     private Vitals vitals;
-    public PeerConnectionHandler(int peerId, ServerSocket listener, Vitals vitals) {
+    public PeerConnectionHandler(int peerId, ServerSocket listener, PeerManager peerManager, Vitals vitals) {
         this.peerId = peerId;
         this.listener = listener;
+        this.peerManager = peerManager;
         this.vitals = vitals;
     }
 
@@ -34,7 +36,7 @@ public class PeerConnectionHandler implements Runnable{
                     break;
                 }
                 Socket socket = new Socket(neighbor.getHostName(), neighbor.getPort());
-                PeerWorker peerWorker = new PeerWorker(vitals, socket, this.peerId, Optional.of(neighbor.getPeerId()));
+                PeerWorker peerWorker = new PeerWorker(peerManager, vitals, socket, this.peerId, Optional.of(neighbor.getPeerId()));
                 vitals.addSocketToMap(neighbor.getPeerId(), socket);
                 vitals.addWorkerToMap(neighbor.getPeerId(), peerWorker);
                 Thread thread = new Thread(peerWorker);
@@ -52,7 +54,7 @@ public class PeerConnectionHandler implements Runnable{
         try {
             while (true) {
                 Socket socket = this.listener.accept();
-                PeerWorker peerWorker = new PeerWorker(vitals, socket, this.peerId, Optional.empty());
+                PeerWorker peerWorker = new PeerWorker(peerManager, vitals, socket, this.peerId, Optional.empty());
                 Thread thread = new Thread(peerWorker);
                 thread.start();
             }
