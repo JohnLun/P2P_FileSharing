@@ -24,6 +24,8 @@ public class PeerWorker implements Runnable{
     private ObjectOutputStream out;
     private BitSet neighborPiecesToChooseFrom;
 
+    private BitSet neighborBitSet;
+
     public PeerWorker(Vitals vitals, Socket socket, int peerId, Optional<Integer> neighborPeerIdOptional) {
         try {
             this.vitals = vitals;
@@ -240,11 +242,14 @@ public class PeerWorker implements Runnable{
 
         // Update the pieces to choose from, since the neighbor is signalling that it has a new piece
         this.neighborPiecesToChooseFrom.set(pieceIndex);
+
         vitals.getPeerLogger().receiveHave(this.neighborPeerId, pieceIndex);
 
         // If this peer does not have the piece that the neighbor has, send an interested message
-        if (vitals.getBitSet().get(pieceIndex)) {
+        if (!vitals.getBitSet().get(pieceIndex)) {
             this.sendInterestedMessage();
+        } else {
+            this.sendNotInterestedMessage();
         }
     }
 
@@ -255,7 +260,7 @@ public class PeerWorker implements Runnable{
 
     public void processBitFieldMessage(ActualMessage actualMessage) {
         BitSet neighborBitSet = BitSet.valueOf(actualMessage.getMessagePayload());
-
+        this.neighborBitSet = neighborBitSet;
         // Get the difference of the neighbor bitset and our bitset
         // the result is a bitset of the pieces we don't have
         neighborBitSet.andNot(vitals.getBitSet());
@@ -268,7 +273,7 @@ public class PeerWorker implements Runnable{
             this.sendInterestedMessage();
         }
         else {
-            sendNotInterestedMessage();
+            this.sendNotInterestedMessage();
         }
     }
 
@@ -343,6 +348,14 @@ public class PeerWorker implements Runnable{
         if (!this.isChoked && this.isInterested) {
             this.sendRequestMessage();
         }
+    }
+
+    public void setChoked(boolean choked) {
+        this.isChoked = choked;
+    }
+
+    public boolean getInterested() {
+        return this.isInterested;
     }
 }
 
