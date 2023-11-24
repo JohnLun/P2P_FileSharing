@@ -33,9 +33,21 @@ public class PeerManager {
     // Create and run peerConnectionHandler
     // This thread makes connections with already existing peers and listens for future connections
     private void runPeerConnectionHandler() {
-        PeerConnectionHandler peerConnectionHandler = new PeerConnectionHandler(this.peerId, listener, this.vitals);
+        PeerConnectionHandler peerConnectionHandler = new PeerConnectionHandler(this.peerId, listener, this, this.vitals);
         Thread thread = new Thread(peerConnectionHandler);
         thread.start();
+    }
+
+    // Send a have message to all neighbors
+    public void sendHaveMessageToAllNeighbors(int piece) {
+        for (Peer peer:this.vitals.getListOfPeers()) {
+            int peerId = peer.getPeerId();
+
+            // There is no worker where the key is this peer's peer id, so skip this peer id
+            if (peerId != this.peerId) {
+                this.vitals.getWorker(peerId).sendHaveMessage(piece);
+            }
+        }
     }
 
 }

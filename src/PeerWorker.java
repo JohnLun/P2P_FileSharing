@@ -10,9 +10,11 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class PeerWorker implements Runnable{
     private final String HANDSHAKE_HEADER = "P2PFILESHARINGPROJ";
+    private PeerManager peerManager;
     private Vitals vitals;
     private int peerId;
     private int neighborPeerId;
+    private int lastRequestedPieceIndex = -1;
     private Socket socket;
     private PeerLogger logger;
     private boolean isInitiator;
@@ -20,14 +22,15 @@ public class PeerWorker implements Runnable{
     private boolean neighborIsChoked;
     private boolean isInterested;
     private boolean neighborIsInterested;
+    private boolean isAlive = true;
+    private boolean lastRequestedPieceSuccessful = false;
     private ObjectInputStream in;
     private ObjectOutputStream out;
     private BitSet neighborPiecesToChooseFrom;
 
-    private BitSet neighborBitSet;
-
-    public PeerWorker(Vitals vitals, Socket socket, int peerId, Optional<Integer> neighborPeerIdOptional) {
+    public PeerWorker(PeerManager peerManager, Vitals vitals, Socket socket, int peerId, Optional<Integer> neighborPeerIdOptional) {
         try {
+            this.peerManager = peerManager;
             this.vitals = vitals;
             this.socket = socket;
             this.in = new ObjectInputStream(socket.getInputStream());
@@ -44,6 +47,11 @@ public class PeerWorker implements Runnable{
         for(Peer peer : vitals.getListOfPeers()) {
             peer.setChoked(false);
         }
+    }
+
+    public void killWorker()
+    {
+        this.isAlive = false;
     }
 
     // Resolve the neighbor peer ID. If the neighbor is the client (ie this is the sender), the neighbor peer id will be passed in as an optional
@@ -65,10 +73,12 @@ public class PeerWorker implements Runnable{
 
     private void runPeerWorker() {
         this.resolveHandshakes();
-        // TODO: Deal with sending initial bit fields
+        if (this.vitals.getThisPeer().hasEntireFile()) {
+            this.sendBitfieldMessage();
+        }
         try {
             // Main loop for reading messages from socket and responding
-            while (true) {
+            while (this.isAlive) {
                 int actualMessageLength = in.readInt();
                 byte[] actualMessageAsBytes = new byte[actualMessageLength];
                 in.read(actualMessageAsBytes);
@@ -192,8 +202,12 @@ public class PeerWorker implements Runnable{
     // When this message is received, it means that the neighbor is choking this message.
     public void processChokeMessage(ActualMessage actualMessage) {
         this.isChoked = true;
-        logger.choke(this.neighborPeerId);
 
+        // If the last request was not completed before choking, set the bitfield value to false
+        if (!this.lastRequestedPieceSuccessful) {
+            this.vitals.getBitSet().set(this.lastRequestedPieceIndex, false);
+        }
+        logger.choke(this.neighborPeerId);
     }
 
     public void sendUnchokeMessage() {
@@ -241,7 +255,7 @@ public class PeerWorker implements Runnable{
         int pieceIndex = ByteBuffer.wrap(actualMessage.getMessagePayload()).getInt();
 
         // Update the pieces to choose from, since the neighbor is signalling that it has a new piece
-        this.neighborPiecesToChooseFrom.set(pieceIndex);
+        this.vitals.mapOfNeighborBitfields.get(this.neighborPeerId).set(pieceIndex);
 
         vitals.getPeerLogger().receiveHave(this.neighborPeerId, pieceIndex);
 
@@ -260,16 +274,17 @@ public class PeerWorker implements Runnable{
 
     public void processBitFieldMessage(ActualMessage actualMessage) {
         BitSet neighborBitSet = BitSet.valueOf(actualMessage.getMessagePayload());
-        this.neighborBitSet = neighborBitSet;
+
+        // Replace the default empty bitset with the received bitfield
+        this.vitals.mapOfNeighborBitfields.put(this.neighborPeerId, neighborBitSet);
+
         // Get the difference of the neighbor bitset and our bitset
         // the result is a bitset of the pieces we don't have
-        neighborBitSet.andNot(vitals.getBitSet());
-
-        // Set this variable for later use
-        this.neighborPiecesToChooseFrom = neighborBitSet;
+        this.neighborPiecesToChooseFrom = (BitSet) neighborBitSet.clone();
+        this.neighborPiecesToChooseFrom.andNot(vitals.getBitSet());
 
         // If the neighbor has pieces we don't, send interested message
-        if (neighborBitSet.cardinality() > 0) {
+        if (this.neighborPiecesToChooseFrom.cardinality() > 0) {
             this.sendInterestedMessage();
         }
         else {
@@ -288,6 +303,8 @@ public class PeerWorker implements Runnable{
 
         // Set the piece here and not when the piece is received, so that other threads do not request the same piece
         this.vitals.getBitSet().set(index);
+        this.lastRequestedPieceIndex = index;
+        this.lastRequestedPieceSuccessful = false;
 
         ByteBuffer b = ByteBuffer.allocate(4);
         b.putInt(index);
@@ -297,6 +314,7 @@ public class PeerWorker implements Runnable{
 
     private int chooseIndexForRequestMessage() {
         // Refresh the pieces to choose from, since other threads may have updated our bitfield
+        this.neighborPiecesToChooseFrom = (BitSet) this.vitals.mapOfNeighborBitfields.get(this.neighborPeerId).clone();
         this.neighborPiecesToChooseFrom.andNot(this.vitals.getBitSet());
 
         // Get a random piece position
@@ -341,8 +359,17 @@ public class PeerWorker implements Runnable{
             throw new IllegalArgumentException("The received piece index is out of bounds.");
         }
 
+        if (this.lastRequestedPieceIndex != pieceIndex) {
+            throw new IllegalArgumentException("The piece index " + this.lastRequestedPieceIndex + " was last requested " +
+                    "but the index " + pieceIndex + " was received");
+        }
+
+        this.lastRequestedPieceSuccessful = true;
+
         // Put data in vitals (and therefore this peer)
         this.vitals.putPiece(pieceIndex, pieceData);
+
+        this.peerManager.sendHaveMessageToAllNeighbors(pieceIndex);
 
         // Finally, request another piece if this peer is not choked and is interested
         if (!this.isChoked && this.isInterested) {

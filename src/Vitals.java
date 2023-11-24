@@ -11,19 +11,22 @@ import java.util.Vector;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Vitals {
-    //TODO: Add getters and setters to private vars
-    private int peerId;
     private CommonConfigHelper commonConfigHelper;
     private PeerInfoConfigHelper peerInfoConfigHelper;
     private HashMap<Integer, Peer> mapOfPeers;
+    private HashMap<Integer, PeerWorker> mapOfWorkers;
+    private HashMap<Integer, Socket> mapOfSockets;
+    public HashMap<Integer, BitSet> mapOfNeighborBitfields;
     private Peer peer;
     private BitSet bitfield;
+    private int peerId;
     private int numPiecesInFile;
     private int numPiecesDownloaded;
     private ServerSocket listener;
 
-    private HashMap<Integer, Socket> mapOfSockets;
     private Vector<Peer> preferredNeighbors;
+    private PeerLogger peerLogger;
+    private byte[] data;
 
     public PeerLogger getPeerLogger() {
         return peerLogger;
@@ -33,17 +36,9 @@ public class Vitals {
         this.peerLogger = peerLogger;
     }
 
-    private PeerLogger peerLogger;
-    private byte[] data;
 
 
-
-    // Map of PeerWorker threads, where the key is the Neighbor peerId
-    // TODO: May need to be modified
-    private HashMap<Integer, PeerWorker> mapOfWorkers;
-
-    // TODO: add interested, not interested, etc
-
+    // Constructor
     public Vitals(int peerId, CommonConfigHelper commonConfigHelper, PeerInfoConfigHelper peerInfoConfigHelper, ServerSocket listener) {
         this.peerId = peerId;
         this.commonConfigHelper = commonConfigHelper;
@@ -53,6 +48,8 @@ public class Vitals {
         data = new byte[commonConfigHelper.getFileSize()];
         this.initVitals();
     }
+
+    // Content Functions ///////////////////////////////////////////////////////////////////////////////////////////////
 
     // Initiate basic vitals
     private void initVitals() {
@@ -77,6 +74,13 @@ public class Vitals {
         }
         else {
             this.numPiecesDownloaded = 0;
+        }
+
+        // Initialize neighbor bitfields
+        for (Peer peer:this.getListOfPeers()) {
+            if (peer.getPeerId() != this.peerId) {
+                this.mapOfNeighborBitfields.put(peer.getPeerId(), new BitSet());
+            }
         }
     }
 
@@ -103,50 +107,6 @@ public class Vitals {
             }
             this.preferredNeighbors.add(listOfPeers.get(randomNum));
         }
-    }
-
-    // Get the port number of a specified peer
-    public int getPort(int peerId) {
-        return this.mapOfPeers.get(peerId).getPort();
-    }
-
-    // Adds workers to hashmap as they are created
-    public void addWorkerToMap(int neighborPeerId, PeerWorker peerWorker) {
-        this.mapOfWorkers.put(neighborPeerId, peerWorker);
-    }
-
-    // Adds sockets to hashmap as they are created
-    public void addSocketToMap(int neighborPeerId, Socket socket) {
-        this.mapOfSockets.put(neighborPeerId, socket);
-    }
-
-    public Peer getPeer(int peerId) {
-        return this.mapOfPeers.get(peerId);
-    }
-    public Peer getThisPeer() {
-        return this.peer;
-    }
-
-    public int getThisPeerId() {
-        return this.peerId;
-    }
-
-    public Vector<Peer> getPreferredNeighbors() {
-        return this.preferredNeighbors;
-    }
-
-    public Vector<Peer> getListOfPeers() {
-        return peerInfoConfigHelper.getListOfPeers();
-    }
-
-    public BitSet getBitSet() {
-        return this.bitfield;
-    }
-    public int getNumPiecesInFile() {
-        return this.numPiecesInFile;
-    }
-    public int getNumPiecesDownloaded() {
-        return this.numPiecesDownloaded;
     }
 
     // This function returns an array with the first four bytes as the index and the rest as the piece data
@@ -200,6 +160,53 @@ public class Vitals {
         System.arraycopy(piece, 0, this.data, offset, piece.length);
     }
 
+    // Getters /////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public Peer getPeer(int peerId) {
+        return this.mapOfPeers.get(peerId);
+    }
+
+    public Peer getThisPeer() {
+        return this.peer;
+    }
+
+    public int getThisPeerId() {
+        return this.peerId;
+    }
+
+    public Vector<Peer> getPreferredNeighbors() {
+        return this.preferredNeighbors;
+    }
+
+    public Vector<Peer> getListOfPeers() {
+        return peerInfoConfigHelper.getListOfPeers();
+    }
+
+    public BitSet getBitSet() {
+        return this.bitfield;
+    }
+
+    public int getNumPiecesInFile() {
+        return this.numPiecesInFile;
+    }
+
+    public HashMap<Integer, PeerWorker> getMapOfWorkers() {
+        return this.mapOfWorkers;
+    }
+
+    public PeerWorker getWorker(int neighborPeerId) {
+        return this.mapOfWorkers.get(neighborPeerId);
+    }
+
+    // Get the port number of a specified peer
+    public int getPort(int peerId) {
+        return this.mapOfPeers.get(peerId).getPort();
+    }
+
+    public int getNumPiecesDownloaded() {
+        return this.numPiecesDownloaded;
+    }
+
     public int getNumPreferredNeighbors() {
         return this.commonConfigHelper.getNumPreferredNeighbors();
     }
@@ -212,9 +219,15 @@ public class Vitals {
         return this.commonConfigHelper.getOptimisticUnchokingInterval();
     }
 
-    public HashMap<Integer, PeerWorker> getMapOfWorkers() {
-        return this.mapOfWorkers;
+    /// Setters ////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // Adds workers to hashmap as they are created
+    public void addWorkerToMap(int neighborPeerId, PeerWorker peerWorker) {
+        this.mapOfWorkers.put(neighborPeerId, peerWorker);
     }
 
-
+    // Adds sockets to hashmap as they are created
+    public void addSocketToMap(int neighborPeerId, Socket socket) {
+        this.mapOfSockets.put(neighborPeerId, socket);
+    }
 }
