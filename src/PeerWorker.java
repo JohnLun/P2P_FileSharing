@@ -330,6 +330,10 @@ public class PeerWorker implements Runnable{
     }
 
     public void processRequestMessage(ActualMessage actualMessage) {
+        if (this.neighborIsChoked) {
+            return;
+        }
+        
         int pieceIndex = ByteBuffer.wrap(actualMessage.getMessagePayload()).getInt();
         if (vitals.getBitSet().get(pieceIndex)) {
             this.sendPieceMessage(pieceIndex);
