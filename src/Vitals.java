@@ -28,6 +28,10 @@ public class Vitals {
     private PeerLogger peerLogger;
     private byte[] data;
 
+    private HashMap<Integer, BitSet> peerBitfields;
+
+    private int totalNumberOfPieces;
+
     public PeerLogger getPeerLogger() {
         return peerLogger;
     }
@@ -35,6 +39,8 @@ public class Vitals {
     public void setPeerLogger(PeerLogger peerLogger) {
         this.peerLogger = peerLogger;
     }
+
+    private volatile boolean shouldTerminate = false;
 
 
 
@@ -230,4 +236,14 @@ public class Vitals {
     public void addSocketToMap(int neighborPeerId, Socket socket) {
         this.mapOfSockets.put(neighborPeerId, socket);
     }
+
+    public synchronized boolean areAllPeersComplete() {
+        for (BitSet bitfield : peerBitfields.values()) {
+            if (bitfield.cardinality() != totalNumberOfPieces) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 }

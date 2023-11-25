@@ -28,6 +28,7 @@ public class PeerWorker implements Runnable{
     private ObjectOutputStream out;
     private BitSet neighborPiecesToChooseFrom;
 
+
     public PeerWorker(PeerManager peerManager, Vitals vitals, Socket socket, int peerId, Optional<Integer> neighborPeerIdOptional) {
         try {
             this.peerManager = peerManager;
@@ -375,6 +376,10 @@ public class PeerWorker implements Runnable{
 
         this.peerManager.sendHaveMessageToAllNeighbors(pieceIndex);
 
+        if (vitals.areAllPeersComplete()) {
+            peerManager.terminate();
+        }
+
         // Finally, request another piece if this peer is not choked and is interested
         if (!this.isChoked && this.isInterested) {
             this.sendRequestMessage();
@@ -388,5 +393,8 @@ public class PeerWorker implements Runnable{
     public boolean getInterested() {
         return this.isInterested;
     }
+
+
+
 }
 
