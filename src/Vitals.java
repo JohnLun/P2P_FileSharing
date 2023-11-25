@@ -246,11 +246,4 @@ public class Vitals {
         return true;
     }
 
-    public synchronized void setShouldTerminate(boolean shouldTerminate) {
-        this.shouldTerminate = shouldTerminate;
-    }
-
-    public synchronized boolean shouldTerminate() {
-        return this.shouldTerminate;
-    }
 }

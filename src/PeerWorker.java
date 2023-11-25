@@ -377,7 +377,7 @@ public class PeerWorker implements Runnable{
         this.peerManager.sendHaveMessageToAllNeighbors(pieceIndex);
 
         if (vitals.areAllPeersComplete()) {
-            this.isAlive = false;
+            peerManager.terminate();
         }
 
         // Finally, request another piece if this peer is not choked and is interested
@@ -393,6 +393,8 @@ public class PeerWorker implements Runnable{
     public boolean getInterested() {
         return this.isInterested;
     }
+
+
 
 }
 

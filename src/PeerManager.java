@@ -50,4 +50,23 @@ public class PeerManager {
         }
     }
 
+    public void terminate() {
+        try {
+            // Signal all peer workers to stop
+            for (Peer peer : vitals.getListOfPeers()) {
+                PeerWorker worker = vitals.getWorker(peer.getPeerId());
+                if (worker != null) {
+                    worker.killWorker();
+                }
+            }
+
+            // Close the server socket to release the port
+            if (listener != null && !listener.isClosed()) {
+                listener.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 }
