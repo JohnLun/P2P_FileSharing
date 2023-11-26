@@ -16,7 +16,7 @@ public class Vitals {
     private HashMap<Integer, Peer> mapOfPeers;
     private HashMap<Integer, PeerWorker> mapOfWorkers;
     private HashMap<Integer, Socket> mapOfSockets;
-    public HashMap<Integer, BitSet> mapOfNeighborBitfields;
+    public HashMap<Integer, BitSet> mapOfPeerBitfields; // Map of bitfields for all peers, including this one
     private Peer peer;
     private BitSet bitfield;
     private int peerId;
@@ -27,8 +27,6 @@ public class Vitals {
     private Vector<Peer> preferredNeighbors;
     private PeerLogger peerLogger;
     private byte[] data;
-
-    private HashMap<Integer, BitSet> peerBitfields;
 
     private int totalNumberOfPieces;
 
@@ -82,10 +80,13 @@ public class Vitals {
             this.numPiecesDownloaded = 0;
         }
 
-        // Initialize neighbor bitfields
+        // Put this peer's bitfield in the map of all bitfields
+        this.mapOfPeerBitfields.put(this.peerId, this.bitfield);
+
+        // Initialize neighbor bitfields and put them into the map of all bitfields
         for (Peer peer:this.getListOfPeers()) {
             if (peer.getPeerId() != this.peerId) {
-                this.mapOfNeighborBitfields.put(peer.getPeerId(), new BitSet());
+                this.mapOfPeerBitfields.put(peer.getPeerId(), new BitSet());
             }
         }
     }
@@ -238,7 +239,7 @@ public class Vitals {
     }
 
     public synchronized boolean areAllPeersComplete() {
-        for (BitSet bitfield : peerBitfields.values()) {
+        for (BitSet bitfield : this.mapOfPeerBitfields.values()) {
             if (bitfield.cardinality() != totalNumberOfPieces) {
                 return false;
             }
