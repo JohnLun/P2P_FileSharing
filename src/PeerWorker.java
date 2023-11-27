@@ -263,7 +263,7 @@ public class PeerWorker implements Runnable{
         int pieceIndex = ByteBuffer.wrap(actualMessage.getMessagePayload()).getInt();
 
         // Update the pieces to choose from, since the neighbor is signalling that it has a new piece
-        this.vitals.mapOfNeighborBitfields.get(this.neighborPeerId).set(pieceIndex);
+        this.vitals.mapOfPeerBitfields.get(this.neighborPeerId).set(pieceIndex);
 
         vitals.getPeerLogger().receiveHave(this.neighborPeerId, pieceIndex);
 
@@ -284,7 +284,7 @@ public class PeerWorker implements Runnable{
         BitSet neighborBitSet = BitSet.valueOf(actualMessage.getMessagePayload());
 
         // Replace the default empty bitset with the received bitfield
-        this.vitals.mapOfNeighborBitfields.put(this.neighborPeerId, neighborBitSet);
+        this.vitals.mapOfPeerBitfields.put(this.neighborPeerId, neighborBitSet);
 
         // Get the difference of the neighbor bitset and our bitset
         // the result is a bitset of the pieces we don't have
@@ -322,7 +322,7 @@ public class PeerWorker implements Runnable{
 
     private int chooseIndexForRequestMessage() {
         // Refresh the pieces to choose from, since other threads may have updated our bitfield
-        this.neighborPiecesToChooseFrom = (BitSet) this.vitals.mapOfNeighborBitfields.get(this.neighborPeerId).clone();
+        this.neighborPiecesToChooseFrom = (BitSet) this.vitals.mapOfPeerBitfields.get(this.neighborPeerId).clone();
         this.neighborPiecesToChooseFrom.andNot(this.vitals.getBitSet());
 
         // Get a random piece position
