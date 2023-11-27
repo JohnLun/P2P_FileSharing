@@ -30,16 +30,6 @@ public class Vitals {
     private PeerLogger peerLogger;
     private byte[] data;
 
-    private int totalNumberOfPieces;
-
-    public PeerLogger getPeerLogger() {
-        return peerLogger;
-    }
-
-    public void setPeerLogger(PeerLogger peerLogger) {
-        this.peerLogger = peerLogger;
-    }
-
     private volatile boolean shouldTerminate = false;
 
 
@@ -62,6 +52,7 @@ public class Vitals {
 
     // Initiate basic vitals
     private void initVitals() {
+        this.peerLogger = new PeerLogger(this);
         this.mapOfPeers = peerInfoConfigHelper.getMapOfPeers();
         this.peer = this.mapOfPeers.get(this.peerId);
         this.mapOfSockets = new HashMap<Integer, Socket>();
@@ -168,8 +159,20 @@ public class Vitals {
 
     public void putPiece(int index, byte[] piece) {
         this.numPiecesDownloaded = this.bitfield.cardinality();
+        if (this.numPiecesDownloaded == this.numPiecesInFile) {
+            this.peerLogger.completeDownload();
+        }
         int offset = index * this.commonConfigHelper.getPieceSize();
         System.arraycopy(piece, 0, this.data, offset, piece.length);
+    }
+
+    public synchronized boolean areAllPeersComplete() {
+        for (BitSet bitfield : this.mapOfPeerBitfields.values()) {
+            if (bitfield.cardinality() != this.numPiecesInFile) {
+                return false;
+            }
+        }
+        return true;
     }
 
     // Getters /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -231,6 +234,10 @@ public class Vitals {
         return this.commonConfigHelper.getOptimisticUnchokingInterval();
     }
 
+    public PeerLogger getPeerLogger() {
+        return this.peerLogger;
+    }
+
     /// Setters ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // Adds workers to hashmap as they are created
@@ -243,13 +250,9 @@ public class Vitals {
         this.mapOfSockets.put(neighborPeerId, socket);
     }
 
-    public synchronized boolean areAllPeersComplete() {
-        for (BitSet bitfield : this.mapOfPeerBitfields.values()) {
-            if (bitfield.cardinality() != totalNumberOfPieces) {
-                return false;
-            }
-        }
-        return true;
+    // Set PeerLogger
+    public void setPeerLogger(PeerLogger peerLogger) {
+        this.peerLogger = peerLogger;
     }
 
     public void addToInterested(int neighborPeerId) {
@@ -305,5 +308,4 @@ public class Vitals {
     public void setUnchokedPeers(HashMap<Integer, PeerWorker> unchokedPeers) {
         this.unchokedPeers = unchokedPeers;
     }
-
 }
