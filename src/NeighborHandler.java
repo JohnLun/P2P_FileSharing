@@ -25,6 +25,7 @@ public class NeighborHandler {
 
     public void initNeighborHandler() {
        try {
+           //empty
            HashMap<Integer, PeerWorker> unchokedPeers = this.vitals.getUnchokedPeers();
            Vector<PeerWorker> newNeighbors = new Vector<PeerWorker>();
            HashMap<Integer, PeerWorker> interestedPeers = this.vitals.getInterestedWorkers();
