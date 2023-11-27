@@ -38,7 +38,7 @@ public class PeerWorker implements Runnable{
             this.out = new ObjectOutputStream(socket.getOutputStream());
             this.peerId = peerId;
             this.resolveNeighborPeerId(neighborPeerIdOptional);
-            logger = new PeerLogger(this.vitals);
+            logger = this.vitals.getPeerLogger();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -102,6 +102,7 @@ public class PeerWorker implements Runnable{
                 while (true) {
                     in.read(neighborHandshakeMessage);
                     this.processHandShakeMessage(neighborHandshakeMessage);
+                    logger.toTcpConnection(this.neighborPeerId);
                     return;
                 }
             }
@@ -110,6 +111,7 @@ public class PeerWorker implements Runnable{
                 while (true) {
                     in.read(neighborHandshakeMessage);
                     this.processHandShakeMessage(neighborHandshakeMessage);
+                    logger.fromTcpConnection(this.neighborPeerId);
 
                     // since the neighbor peer id was not known until now, add this worker and this socket to their corresponding maps
                     vitals.addWorkerToMap(this.neighborPeerId, this);
@@ -258,7 +260,7 @@ public class PeerWorker implements Runnable{
         // Update the pieces to choose from, since the neighbor is signalling that it has a new piece
         this.vitals.mapOfPeerBitfields.get(this.neighborPeerId).set(pieceIndex);
 
-        vitals.getPeerLogger().receiveHave(this.neighborPeerId, pieceIndex);
+        logger.receiveHave(this.neighborPeerId, pieceIndex);
 
         // If this peer does not have the piece that the neighbor has, send an interested message
         if (!vitals.getBitSet().get(pieceIndex)) {
@@ -369,15 +371,17 @@ public class PeerWorker implements Runnable{
                     "but the index " + pieceIndex + " was received");
         }
 
-        this.lastRequestedPieceSuccessful = true;
-
         // Put data in vitals (and therefore this peer)
         this.vitals.putPiece(pieceIndex, pieceData);
+
+        this.lastRequestedPieceSuccessful = true;
+
+        this.logger.downloadPiece(this.neighborPeerId, pieceIndex, pieceData.length);
 
         this.peerManager.sendHaveMessageToAllNeighbors(pieceIndex);
 
         if (vitals.areAllPeersComplete()) {
-            peerManager.terminate();
+            this.peerManager.terminate();
         }
 
         // Finally, request another piece if this peer is not choked and is interested
