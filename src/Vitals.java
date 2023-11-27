@@ -5,9 +5,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
-import java.util.BitSet;
-import java.util.HashMap;
-import java.util.Vector;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Vitals {
@@ -15,6 +13,10 @@ public class Vitals {
     private PeerInfoConfigHelper peerInfoConfigHelper;
     private HashMap<Integer, Peer> mapOfPeers;
     private HashMap<Integer, PeerWorker> mapOfWorkers;
+
+    private HashMap<Integer, Double> mapOfDownloadRates;
+    private HashMap<Integer, PeerWorker> unchokedPeers;
+    private HashMap<Integer, PeerWorker> interestedPeers;
     private HashMap<Integer, Socket> mapOfSockets;
     public HashMap<Integer, BitSet> mapOfNeighborBitfields;
     private Peer peer;
@@ -53,6 +55,9 @@ public class Vitals {
         preferredNeighbors = new Vector<Peer>();
         data = new byte[commonConfigHelper.getFileSize()];
         this.initVitals();
+        this.interestedPeers = new HashMap<Integer, PeerWorker>();
+        this.unchokedPeers = new HashMap<Integer, PeerWorker>();
+        this.mapOfDownloadRates = new HashMap<Integer, Double>();
     }
 
     // Content Functions ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -244,6 +249,60 @@ public class Vitals {
             }
         }
         return true;
+    }
+
+    public void addToInterested(int neighborPeerId) {
+        this.interestedPeers.put(neighborPeerId, mapOfWorkers.get(neighborPeerId));
+    }
+
+    public void removeFromInterested(int neighborPeerId) {
+        if (!this.interestedPeers.isEmpty()) {
+            this.interestedPeers.remove(neighborPeerId);
+        }
+    }
+
+    public void addToUnchoked(int neighborPeerId) {
+        this.unchokedPeers.put(neighborPeerId, mapOfWorkers.get(neighborPeerId));
+    }
+
+    public HashMap<Integer, PeerWorker> getUnchokedPeers() {
+        return this.unchokedPeers;
+    }
+
+    public HashMap getInterestedWorkers() {
+        return this.interestedPeers;
+    }
+
+    public void sortDownloadRates() {
+        Iterator iter = mapOfPeers.entrySet().iterator();
+        while (iter.hasNext()) {
+            Map.Entry peerEntry = (Map.Entry)iter.next();
+            mapOfDownloadRates.put((int)peerEntry.getKey(), ((PeerWorker)peerEntry.getValue()).getDownloadRate());
+        }
+
+        List<Map.Entry<Integer, Double>> list = new LinkedList<>(mapOfDownloadRates.entrySet());
+
+        Collections.sort(list, new Comparator<Map.Entry<Integer, Double>>() {
+            @Override
+            public int compare(Map.Entry<Integer, Double> o1, Map.Entry<Integer, Double> o2) {
+                return o1.getValue().compareTo(o2.getValue());
+            }
+        });
+
+        LinkedHashMap<Integer, Double> sortedHashMap = new LinkedHashMap<>();
+        for (Map.Entry<Integer, Double> entry : list) {
+            sortedHashMap.put(entry.getKey(), entry.getValue());
+        }
+        this.mapOfDownloadRates = sortedHashMap;
+    }
+
+    public HashMap<Integer, Double> getMapOfDownloadRates() {
+        sortDownloadRates();
+        return this.mapOfDownloadRates;
+    }
+
+    public void setUnchokedPeers(HashMap<Integer, PeerWorker> unchokedPeers) {
+        this.unchokedPeers = unchokedPeers;
     }
 
 }

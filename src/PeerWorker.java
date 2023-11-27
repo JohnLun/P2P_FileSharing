@@ -15,6 +15,8 @@ public class PeerWorker implements Runnable{
     private int peerId;
     private int neighborPeerId;
     private int lastRequestedPieceIndex = -1;
+
+    public double downloadRate;
     private Socket socket;
     private PeerLogger logger;
     private boolean isInitiator;
@@ -29,6 +31,7 @@ public class PeerWorker implements Runnable{
     private BitSet neighborPiecesToChooseFrom;
 
 
+
     public PeerWorker(PeerManager peerManager, Vitals vitals, Socket socket, int peerId, Optional<Integer> neighborPeerIdOptional) {
         try {
             this.peerManager = peerManager;
@@ -39,6 +42,8 @@ public class PeerWorker implements Runnable{
             this.peerId = peerId;
             this.resolveNeighborPeerId(neighborPeerIdOptional);
             logger = new PeerLogger(this.vitals);
+            this.downloadRate = 0.0;
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -230,6 +235,7 @@ public class PeerWorker implements Runnable{
 
     // When this message is received, it means that the neighbor is interested
     public void processInterestedMessage(ActualMessage actualMessage) {
+        this.vitals.addToInterested(this.neighborPeerId);
         this.neighborIsInterested = true;
         logger.receiveInterested(this.neighborPeerId);
     }
@@ -241,6 +247,7 @@ public class PeerWorker implements Runnable{
 
     // When this message is received, it means that the neighbor is not interested
     public void processNotInterestedMessage(ActualMessage actualMessage) {
+        this.vitals.removeFromInterested(this.neighborPeerId);
         this.neighborIsInterested = false;
         logger.receiveNotInterested(this.neighborPeerId);
     }
@@ -373,6 +380,7 @@ public class PeerWorker implements Runnable{
 
         // Put data in vitals (and therefore this peer)
         this.vitals.putPiece(pieceIndex, pieceData);
+        this.downloadRate++;
 
         this.peerManager.sendHaveMessageToAllNeighbors(pieceIndex);
 
@@ -392,6 +400,25 @@ public class PeerWorker implements Runnable{
 
     public boolean getInterested() {
         return this.isInterested;
+    }
+
+    public int getPeerId() {
+        return this.peerId;
+    }
+
+    public boolean equals(PeerWorker peerWorker) {
+        if (this.peerId == peerWorker.getPeerId()) {
+            return true;
+        }
+        return false;
+    }
+
+    public void setDownloadRate(double dr) {
+        this.downloadRate = dr;
+    }
+
+    public double getDownloadRate() {
+        return this.downloadRate;
     }
 
 
