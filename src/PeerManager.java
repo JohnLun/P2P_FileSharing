@@ -8,7 +8,7 @@ public class PeerManager {
     private int peerId;
     private CommonConfigHelper commonConfigHelper;
     private PeerInfoConfigHelper peerInfoConfigHelper;
-    private Vitals vitals;
+    private volatile Vitals vitals;
     private ServerSocket listener;
 
     public PeerManager(int peerId) {
@@ -39,7 +39,7 @@ public class PeerManager {
     }
 
     // Send a have message to all neighbors
-    public void sendHaveMessageToAllNeighbors(int piece) {
+    public synchronized void sendHaveMessageToAllNeighbors(int piece) {
         for (Peer peer:this.vitals.getListOfPeers()) {
             int peerId = peer.getPeerId();
 

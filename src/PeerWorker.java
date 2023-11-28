@@ -136,11 +136,11 @@ public class PeerWorker implements Runnable{
     }
 
     // Send handshake message to neighbor
-    public void sendHandshakeMessage() {
+    public synchronized void sendHandshakeMessage() {
         try {
             byte[] msgToSend = MessageCreator.createHandshakeMessage(this.peerId);
-            out.write(msgToSend);
-            out.flush();
+            this.out.write(msgToSend);
+            this.out.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -166,11 +166,11 @@ public class PeerWorker implements Runnable{
         }
     }
 
-    public void sendActualMessage(byte messageType, byte[] messagePayload) {
+    public synchronized void sendActualMessage(byte messageType, byte[] messagePayload) {
         try {
             byte[] msgToSend = MessageCreator.createActualMessage(messageType, messagePayload);
-            out.write(msgToSend);
-            out.flush();
+            this.out.write(msgToSend);
+            this.out.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
