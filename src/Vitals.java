@@ -52,10 +52,11 @@ public class Vitals {
 
     // Initiate basic vitals
     private void initVitals() {
-        this.peerLogger = new PeerLogger(this);
         this.mapOfPeers = peerInfoConfigHelper.getMapOfPeers();
+        this.mapOfPeerBitfields = new HashMap<>();
         this.peer = this.mapOfPeers.get(this.peerId);
         this.mapOfSockets = new HashMap<Integer, Socket>();
+        this.peerLogger = new PeerLogger(this);
         this.initBitFieldAndData();
     }
 

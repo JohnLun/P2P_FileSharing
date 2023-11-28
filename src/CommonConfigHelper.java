@@ -12,13 +12,13 @@ public class CommonConfigHelper {
     private int fileSize;
     private int pieceSize;
 
-    public CommonConfigHelper(String fileName) {
-        this.processFile(fileName);
+    public CommonConfigHelper(String filePath) {
+        this.processFile(filePath);
     }
 
     private void processFile(String filePath) {
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(this.fileName));
+            BufferedReader reader = new BufferedReader(new FileReader(filePath));
             String line = reader.readLine();
 
             // Loop through each line in file
