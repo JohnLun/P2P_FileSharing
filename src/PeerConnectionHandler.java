@@ -7,11 +7,13 @@ import java.util.Vector;
 
 public class PeerConnectionHandler implements Runnable{
     private int peerId;
+    private boolean isAlive;
     private ServerSocket listener;
     private PeerManager peerManager;
     private Vitals vitals;
     public PeerConnectionHandler(int peerId, ServerSocket listener, PeerManager peerManager, Vitals vitals) {
         this.peerId = peerId;
+        this.isAlive = true;
         this.listener = listener;
         this.peerManager = peerManager;
         this.vitals = vitals;
@@ -52,7 +54,9 @@ public class PeerConnectionHandler implements Runnable{
     // Since the neighborId is unknown, the map of sockets and map of workers will be updated within the worker thread, and NOT here
     private void listenForNewConnections() {
         try {
-            while (true) {
+            System.out.println("Checking for incoming connections");
+            while (isAlive) {
+                System.out.println("listening for new connections");
                 Socket socket = this.listener.accept();
                 PeerWorker peerWorker = new PeerWorker(peerManager, vitals, socket, this.peerId, Optional.empty());
                 Thread thread = new Thread(peerWorker);
@@ -61,6 +65,10 @@ public class PeerConnectionHandler implements Runnable{
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void kill() {
+        this.isAlive = false;
     }
 
 }

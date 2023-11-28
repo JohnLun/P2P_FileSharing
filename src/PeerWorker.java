@@ -37,8 +37,10 @@ public class PeerWorker implements Runnable{
             this.peerManager = peerManager;
             this.vitals = vitals;
             this.socket = socket;
-            this.in = new ObjectInputStream(socket.getInputStream());
+            System.out.println("");
             this.out = new ObjectOutputStream(socket.getOutputStream());
+            this.out.flush();
+            this.in = new ObjectInputStream(socket.getInputStream());
             this.peerId = peerId;
             this.resolveNeighborPeerId(neighborPeerIdOptional);
             this.logger = this.vitals.getPeerLogger();

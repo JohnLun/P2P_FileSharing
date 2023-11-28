@@ -60,6 +60,8 @@ public class PeerManager {
                 }
             }
 
+            // TODO: kill connection handler thread
+
             // Close the server socket to release the port
             if (listener != null && !listener.isClosed()) {
                 listener.close();

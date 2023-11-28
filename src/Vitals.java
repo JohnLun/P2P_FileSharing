@@ -56,6 +56,7 @@ public class Vitals {
         this.mapOfPeerBitfields = new HashMap<>();
         this.peer = this.mapOfPeers.get(this.peerId);
         this.mapOfSockets = new HashMap<Integer, Socket>();
+        this.mapOfWorkers = new HashMap<>();
         this.peerLogger = new PeerLogger(this);
         this.initBitFieldAndData();
     }
@@ -308,5 +309,18 @@ public class Vitals {
 
     public void setUnchokedPeers(HashMap<Integer, PeerWorker> unchokedPeers) {
         this.unchokedPeers = unchokedPeers;
+    }
+
+    // Printing
+    public void printSocketMap() {
+        for (Map.Entry<Integer,Socket> entry : this.mapOfSockets.entrySet())
+            System.out.println("Key = " + entry.getKey() +
+                    ", Value = " + entry.getValue().getLocalAddress());
+    }
+
+    public void printWorkerMap() {
+        for (Map.Entry<Integer,PeerWorker> entry : this.mapOfWorkers.entrySet())
+            System.out.println("Key = " + entry.getKey() +
+                    ", Value = " + entry.getValue().getPeerId());
     }
 }
