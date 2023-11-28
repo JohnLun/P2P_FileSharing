@@ -23,10 +23,10 @@ public class MessageCreator {
         System.arraycopy(handshakeMessage.getZeroBits(), 0, handshakeMessageAsBytes, handshakeHeaderAsBytes.length, 10);
 
         // Add peerId to byte array
-        ByteBuffer b = ByteBuffer.allocate(4);
-        b.putInt(peerId);
-        //byte[] peerIdAsBytes = b.array();
-        byte[] peerIdAsBytes = Integer.toString(peerId).getBytes(StandardCharsets.UTF_8);
+        //ByteBuffer b = ByteBuffer.allocate(4);
+        //b.putInt(peerId);
+        byte[] peerIdAsBytes = ByteBuffer.allocate(4).putInt(peerId).array();
+        //byte[] peerIdAsBytes = Integer.toString(peerId).getBytes(StandardCharsets.UTF_8);
         System.arraycopy(peerIdAsBytes, 0, handshakeMessageAsBytes, handshakeHeaderAsBytes.length + 10, 4);
 
         return handshakeMessageAsBytes;

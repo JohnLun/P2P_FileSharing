@@ -1,3 +1,5 @@
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.BitSet;
 
 public class PeerProcess {
@@ -13,14 +15,13 @@ public class PeerProcess {
         }
         else {
             System.out.println("The program has successfully compiled!");
-            BitSet tmp1 = new BitSet(4);
-            BitSet tmp2 = new BitSet(4);
-            tmp1.set(0,2);
-            tmp2.set(1,3);
-            System.out.println(tmp1);
-            System.out.println(tmp2);
-            tmp1.andNot(tmp2);
-            System.out.println(tmp1);
+            int tmp = 1001;
+            //byte[] a = Integer.toString(tmp).getBytes(StandardCharsets.UTF_8);
+            byte[] a = ByteBuffer.allocate(4).putInt(tmp).array();
+            ByteBuffer buffer = ByteBuffer.wrap(a);
+            System.out.println(a.length);
+            int pieceIndex = buffer.getInt();
+            System.out.println(pieceIndex);
         }
     }
 }
