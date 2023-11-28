@@ -93,6 +93,7 @@ public class PeerWorker implements Runnable{
                 byte[] actualMessageAsBytes = new byte[actualMessageLength];
                 in.read(actualMessageAsBytes);
                 ActualMessage actualMessage = new ActualMessage(actualMessageAsBytes);
+                byte messageType = actualMessage.getMessageType();
                 this.processActualMessage(actualMessage);
             }
         } catch (IOException e) {
@@ -300,6 +301,7 @@ public class PeerWorker implements Runnable{
         // If the neighbor has pieces we don't, send interested message
         if (this.neighborPiecesToChooseFrom.cardinality() > 0) {
             this.sendInterestedMessage();
+            this.sendRequestMessage();
         }
         else {
             this.sendNotInterestedMessage();
@@ -323,7 +325,7 @@ public class PeerWorker implements Runnable{
         ByteBuffer b = ByteBuffer.allocate(4);
         b.putInt(index);
         byte[] indexAsBytes = b.array();
-        this.sendActualMessage((byte)0x04, indexAsBytes);
+        this.sendActualMessage((byte)0x06, indexAsBytes);
     }
 
     private int chooseIndexForRequestMessage() {
@@ -388,7 +390,7 @@ public class PeerWorker implements Runnable{
 
         this.lastRequestedPieceSuccessful = true;
 
-        this.logger.downloadPiece(this.neighborPeerId, pieceIndex, pieceData.length);
+        this.logger.downloadPiece(this.neighborPeerId, pieceIndex, this.vitals.getNumPiecesDownloaded());
 
         this.peerManager.sendHaveMessageToAllNeighbors(pieceIndex);
 
