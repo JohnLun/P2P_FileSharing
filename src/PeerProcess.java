@@ -5,8 +5,8 @@ public class PeerProcess {
         if (args.length == 1) {
             try {
                 int peerId = Integer.valueOf(args[0]);
-                //PeerManager peerManager = new PeerManager(peerId);
-                //peerManager.run();
+                PeerManager peerManager = new PeerManager(peerId);
+                peerManager.run();
             } catch (NumberFormatException e) {
                 e.printStackTrace();
             }
