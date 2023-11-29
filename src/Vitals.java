@@ -164,9 +164,6 @@ public class Vitals {
 
     public void putPiece(int index, byte[] piece) {
         this.numPiecesDownloaded = this.bitfield.cardinality();
-        if (this.numPiecesDownloaded == this.numPiecesInFile) {
-            this.peerLogger.completeDownload();
-        }
         int offset = index * this.commonConfigHelper.getPieceSize();
         System.arraycopy(piece, 0, this.data, offset, piece.length);
     }
@@ -178,6 +175,13 @@ public class Vitals {
             }
         }
         return true;
+    }
+
+    public void isThisPeerComplete() {
+        // Check if this peer is complete to log
+        if (this.numPiecesDownloaded == this.numPiecesInFile) {
+            this.peerLogger.completeDownload();
+        }
     }
 
     // Getters /////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -280,6 +280,11 @@ public class PeerWorker implements Runnable{
         } else {
             this.sendNotInterestedMessage();
         }
+
+        // Check if all peers are done
+        if (this.vitals.areAllPeersComplete()) {
+            this.peerManager.terminate();
+        }
     }
 
     public void sendBitfieldMessage() {
@@ -309,6 +314,11 @@ public class PeerWorker implements Runnable{
     }
 
     public void sendRequestMessage() {
+        // Check if the last request piece was successful. If unsuccessful, reset the bitfield index to false
+        if (!this.lastRequestedPieceSuccessful) {
+            this.vitals.getBitSet().set(this.lastRequestedPieceIndex, false);
+        }
+
         int index = this.chooseIndexForRequestMessage();
 
         // If there are no pieces that this peer wants, send a not interested message
@@ -395,7 +405,8 @@ public class PeerWorker implements Runnable{
 
         this.peerManager.sendHaveMessageToAllNeighbors(pieceIndex);
 
-        if (vitals.areAllPeersComplete()) {
+        this.vitals.isThisPeerComplete();
+        if (this.vitals.areAllPeersComplete()) {
             this.peerManager.terminate();
         }
 
