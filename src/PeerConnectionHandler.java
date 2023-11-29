@@ -63,7 +63,8 @@ public class PeerConnectionHandler implements Runnable{
                 thread.start();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            //TODO most exception prints stem from here
+            e.printStackTrace(); // most errors will come from here
         }
     }
 

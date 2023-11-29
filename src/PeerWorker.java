@@ -407,11 +407,18 @@ public class PeerWorker implements Runnable{
 
         this.vitals.isThisPeerComplete();
         if (this.vitals.areAllPeersComplete()) {
-            this.peerManager.terminate();
+            try
+            {
+                this.peerManager.terminate();
+            }
+            catch (Exception e) {}
+
         }
 
+
         // Finally, request another piece if this peer is not choked and is interested
-        if (!this.isChoked && this.isInterested) {
+        //TODO just see if the areAllPeers complete call screws up an edge case
+        if (!this.isChoked && this.isInterested && !this.vitals.areAllPeersComplete()) {
             this.sendRequestMessage();
         }
     }
