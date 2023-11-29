@@ -1,6 +1,6 @@
 import java.util.*;
 
-public class NeighborHandler {
+public class NeighborHandler implements Runnable{
     private Vitals vitals;
 
     private Vector<Peer> preferredNeighbors;
@@ -21,6 +21,10 @@ public class NeighborHandler {
         this.peerId = this.vitals.getThisPeerId();
         this.preferredNeighbors = this.vitals.getPreferredNeighbors();
         this.mapOfWorkers = this.vitals.getMapOfWorkers();
+    }
+
+    public void run() {
+
     }
 
     //TODO: Logging for preferred neighbors

@@ -1,10 +1,14 @@
 import java.util.*;
 
-public class OptimisticallyUnchokedNeighborHandler {
+public class OptimisticallyUnchokedNeighborHandler implements Runnable{
     private Vitals vitals;
     private Random random;
 
     //TODO: Not sure if there needs to be more implemented to insure this is integrated with the rest of the code
+
+    public void run() {
+
+    }
 
     public void initOptimisticallyUnchokedNeighborHandler() {
         try {
