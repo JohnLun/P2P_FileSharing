@@ -10,7 +10,7 @@ public class OptimisticallyUnchokedNeighborHandler implements Runnable{
         this.vitals = vitals;
     }
     public void run() {
-
+        this.initOptimisticallyUnchokedNeighborHandler();
     }
 
     public void initOptimisticallyUnchokedNeighborHandler() {

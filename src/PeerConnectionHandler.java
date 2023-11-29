@@ -71,5 +71,4 @@ public class PeerConnectionHandler implements Runnable{
     public void kill() {
         this.isAlive = false;
     }
-
 }

@@ -25,7 +25,6 @@ public class Vitals {
     private int numPiecesInFile;
     private int numPiecesDownloaded;
     private ServerSocket listener;
-
     private Vector<Peer> preferredNeighbors;
     private PeerLogger peerLogger;
     private byte[] data;
