@@ -23,6 +23,7 @@ public class NeighborHandler {
         this.mapOfWorkers = this.vitals.getMapOfWorkers();
     }
 
+    //TODO: Logging for preferred neighbors
     public void initNeighborHandler() {
        try {
            //empty
@@ -46,6 +47,7 @@ public class NeighborHandler {
                        }
 
                        newNeighbors.add(nextPeer);
+
                        nextPeer.setDownloadRate(0.0);
                    }
                } else {
@@ -84,7 +86,7 @@ public class NeighborHandler {
 
 
        } catch (Exception e) {
-
+            e.printStackTrace();
        }
     }
 
