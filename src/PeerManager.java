@@ -11,6 +11,8 @@ public class PeerManager {
     private volatile Vitals vitals;
     private ServerSocket listener;
 
+    private Thread connectionHandlerThread;
+
     public PeerManager(int peerId) {
         this.peerId = peerId;
         this.commonConfigHelper = new CommonConfigHelper("Common.cfg");
@@ -34,8 +36,8 @@ public class PeerManager {
     // This thread makes connections with already existing peers and listens for future connections
     private void runPeerConnectionHandler() {
         PeerConnectionHandler peerConnectionHandler = new PeerConnectionHandler(this.peerId, listener, this, this.vitals);
-        Thread thread = new Thread(peerConnectionHandler);
-        thread.start();
+        connectionHandlerThread = new Thread(peerConnectionHandler);
+        connectionHandlerThread.start();
     }
 
     // Send a have message to all neighbors
@@ -60,7 +62,7 @@ public class PeerManager {
                 }
             }
 
-            // TODO: kill connection handler thread
+            connectionHandlerThread.interrupt();
 
             // Close the server socket to release the port
             if (listener != null && !listener.isClosed()) {
