@@ -32,6 +32,9 @@ public class Vitals {
 
     private volatile boolean shouldTerminate = false;
 
+    private Integer optimisticallyUnchokedPeerId = null; // Field to store the ID of the current optimistically unchoked peer
+
+
 
 
     // Constructor
@@ -322,5 +325,19 @@ public class Vitals {
         for (Map.Entry<Integer,PeerWorker> entry : this.mapOfWorkers.entrySet())
             System.out.println("Key = " + entry.getKey() +
                     ", Value = " + entry.getValue().getPeerId());
+    }
+
+    public void setOptimisticallyUnchokedPeer(Integer peerId) {
+        if ((this.optimisticallyUnchokedPeerId == null && peerId != null) ||
+                (this.optimisticallyUnchokedPeerId != null && !this.optimisticallyUnchokedPeerId.equals(peerId))) {
+            this.peerLogger.changeOptUnchokedNeighbor(getThisPeerId()); //if it changes, send log
+        }
+
+        this.optimisticallyUnchokedPeerId = peerId; //set optimisticallyUnchokedPeerId
+    }
+
+    // Method to get the current optimistically unchoked peer
+    public Integer getOptimisticallyUnchokedPeer() {
+        return this.optimisticallyUnchokedPeerId;
     }
 }
