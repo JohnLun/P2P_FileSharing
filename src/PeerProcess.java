@@ -18,7 +18,7 @@ public class PeerProcess {
             int tmp = 1001;
             //byte[] a = Integer.toString(tmp).getBytes(StandardCharsets.UTF_8);
             //byte[] a = ByteBuffer.allocate(4).putInt(tmp).array();
-            byte[] a = new byte[] {(byte)0, (byte)0, (byte)64, (byte)5};
+            byte[] a = new byte[] {(byte)55, (byte)13, (byte)10, (byte)49};
             ByteBuffer buffer = ByteBuffer.wrap(a);
             System.out.println(a.length);
             int pieceIndex = buffer.getInt();

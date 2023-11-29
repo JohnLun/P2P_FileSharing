@@ -68,7 +68,7 @@ public class Vitals {
 
         // Set all bits to 1 if this peer has the entire file
         if (this.peer.hasEntireFile()) {
-            this.bitfield.set(0, numPiecesInFile - 1, true);
+            this.bitfield.set(0, numPiecesInFile, true);
             this.numPiecesDownloaded = this.numPiecesInFile;
 
             // If our peer has the entire file according to the config, read the file into our data array

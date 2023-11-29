@@ -91,7 +91,7 @@ public class PeerWorker implements Runnable{
             while (this.isAlive) {
                 int actualMessageLength = in.readInt();
                 byte[] actualMessageAsBytes = new byte[actualMessageLength];
-                in.read(actualMessageAsBytes);
+                in.readFully(actualMessageAsBytes);
                 ActualMessage actualMessage = new ActualMessage(actualMessageAsBytes);
                 byte messageType = actualMessage.getMessageType();
                 this.processActualMessage(actualMessage);
@@ -332,6 +332,7 @@ public class PeerWorker implements Runnable{
         // Refresh the pieces to choose from, since other threads may have updated our bitfield
         this.neighborPiecesToChooseFrom = (BitSet) this.vitals.mapOfPeerBitfields.get(this.neighborPeerId).clone();
         this.neighborPiecesToChooseFrom.andNot(this.vitals.getBitSet());
+
 
         // Get a random piece position
         int randomPosition = ThreadLocalRandom.current().nextInt(0, this.vitals.getNumPiecesInFile());
