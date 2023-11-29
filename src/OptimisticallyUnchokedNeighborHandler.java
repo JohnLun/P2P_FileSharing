@@ -2,10 +2,13 @@ import java.util.*;
 
 public class OptimisticallyUnchokedNeighborHandler implements Runnable{
     private Vitals vitals;
+    private int optUnchokedId;
     private Random random;
 
     //TODO: Not sure if there needs to be more implemented to insure this is integrated with the rest of the code
-
+    public OptimisticallyUnchokedNeighborHandler(Vitals vitals) {
+        this.vitals = vitals;
+    }
     public void run() {
 
     }
@@ -25,13 +28,17 @@ public class OptimisticallyUnchokedNeighborHandler implements Runnable{
 
             // Randomly select one peer to be optimistically unchoked
             if (!candidates.isEmpty()) {
+                this.random = new Random();
                 PeerWorker selectedPeer = candidates.get(random.nextInt(candidates.size()));
                 selectedPeer.sendUnchokeMessage();
-                this.vitals.setOptimisticallyUnchokedPeer(selectedPeer.getPeerId());
+                this.optUnchokedId = selectedPeer.getPeerId();
             }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    public int getOptUnchokedId() {
+        return this.optUnchokedId;
     }
 }

@@ -14,7 +14,7 @@ public class Vitals {
     private HashMap<Integer, Peer> mapOfPeers;
     private HashMap<Integer, PeerWorker> mapOfWorkers;
 
-    private HashMap<Integer, Double> mapOfDownloadRates;
+    private LinkedHashMap<Integer, Double> mapOfDownloadRates;
     private HashMap<Integer, PeerWorker> unchokedPeers;
     private HashMap<Integer, PeerWorker> interestedPeers;
     private HashMap<Integer, Socket> mapOfSockets;
@@ -48,7 +48,7 @@ public class Vitals {
         this.initVitals();
         this.interestedPeers = new HashMap<Integer, PeerWorker>();
         this.unchokedPeers = new HashMap<Integer, PeerWorker>();
-        this.mapOfDownloadRates = new HashMap<Integer, Double>();
+        this.mapOfDownloadRates = new LinkedHashMap<Integer, Double>();
     }
 
     // Content Functions ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -289,23 +289,20 @@ public class Vitals {
             mapOfDownloadRates.put((int)peerEntry.getKey(), ((PeerWorker)peerEntry.getValue()).getDownloadRate());
         }
 
-        List<Map.Entry<Integer, Double>> list = new LinkedList<>(mapOfDownloadRates.entrySet());
+        List<Map.Entry<Integer, Double>> list = new ArrayList<>(mapOfDownloadRates.entrySet());
 
-        Collections.sort(list, new Comparator<Map.Entry<Integer, Double>>() {
-            @Override
-            public int compare(Map.Entry<Integer, Double> o1, Map.Entry<Integer, Double> o2) {
-                return o1.getValue().compareTo(o2.getValue());
-            }
-        });
+        // Sort the list based on values (in descending order)
+        list.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
 
-        LinkedHashMap<Integer, Double> sortedHashMap = new LinkedHashMap<>();
+        // Create a new LinkedHashMap to maintain the order
+        LinkedHashMap<Integer, Double> sortedMap = new LinkedHashMap<>();
         for (Map.Entry<Integer, Double> entry : list) {
-            sortedHashMap.put(entry.getKey(), entry.getValue());
+            sortedMap.put(entry.getKey(), entry.getValue());
         }
-        this.mapOfDownloadRates = sortedHashMap;
+        this.mapOfDownloadRates = sortedMap;
     }
 
-    public HashMap<Integer, Double> getMapOfDownloadRates() {
+    public LinkedHashMap<Integer, Double> getMapOfDownloadRates() {
         sortDownloadRates();
         return this.mapOfDownloadRates;
     }
