@@ -44,10 +44,10 @@ public class Vitals {
         this.listener = listener;
         preferredNeighbors = new Vector<Peer>();
         data = new byte[commonConfigHelper.getFileSize()];
+        this.mapOfDownloadRates = new LinkedHashMap<Integer, Double>();
         this.initVitals();
         this.interestedPeers = new HashMap<Integer, PeerWorker>();
         this.unchokedPeers = new HashMap<Integer, PeerWorker>();
-        this.mapOfDownloadRates = new LinkedHashMap<Integer, Double>();
     }
 
     // Content Functions ///////////////////////////////////////////////////////////////////////////////////////////////
