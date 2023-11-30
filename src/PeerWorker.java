@@ -15,7 +15,6 @@ public class PeerWorker implements Runnable{
     private int peerId;
     private int neighborPeerId;
     private int lastRequestedPieceIndex = -1;
-
     public double downloadRate;
     private Socket socket;
     private PeerLogger logger;
@@ -25,7 +24,7 @@ public class PeerWorker implements Runnable{
     private boolean isInterested;
     private boolean neighborIsInterested;
     private boolean isAlive = true;
-    private boolean lastRequestedPieceSuccessful = false;
+    private boolean lastRequestedPieceSuccessful = true;
     private ObjectInputStream in;
     private ObjectOutputStream out;
     private BitSet neighborPiecesToChooseFrom;
@@ -232,7 +231,11 @@ public class PeerWorker implements Runnable{
     public void processUnchokeMessage(ActualMessage actualMessage) {
         this.isChoked = false;
         logger.unchoke(this.neighborPeerId);
-        this.sendRequestMessage();
+        if (this.lastRequestedPieceSuccessful)
+        {
+            this.sendRequestMessage();
+        }
+
     }
 
     public void sendInterestedMessage() {
