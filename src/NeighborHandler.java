@@ -1,4 +1,5 @@
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class NeighborHandler implements Runnable{
 
@@ -36,11 +37,10 @@ public class NeighborHandler implements Runnable{
                int iter = Math.min(this.vitals.getNumPreferredNeighbors(), interestedPeers.size());
                if (checkIfCompletedFile()) {
                    for (int i = 0; i < iter; i++) {
-                       Random random = new Random();
-                       int randomIndex = random.nextInt(iter-1);
+                       int randomIndex = ThreadLocalRandom.current().nextInt(0, iter);
                        PeerWorker nextPeer = this.vitals.getWorker(interestedPeerIds.get(randomIndex));
                        while (this.vitals.getThisPeerId() == nextPeer.getPeerId()) {
-                           randomIndex = random.nextInt(iter-1);
+                           randomIndex = ThreadLocalRandom.current().nextInt(0, iter);
                            nextPeer = this.vitals.getWorker(interestedPeerIds.get(randomIndex));
                        }
                        if (!unchokedPeers.containsKey(nextPeer.getPeerId()) && nextPeer.getPeerId() != this.optimisticallyUnchokedNeighborHandler.getOptUnchokedId()) {
