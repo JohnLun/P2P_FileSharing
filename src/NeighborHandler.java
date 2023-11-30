@@ -1,10 +1,10 @@
 import java.util.*;
 
 public class NeighborHandler implements Runnable{
+
     private Vitals vitals;
 
     private Vector<Peer> preferredNeighbors;
-
     private OptimisticallyUnchokedNeighborHandler optimisticallyUnchokedNeighborHandler;
     private HashMap<Integer, PeerWorker> mapOfWorkers;
 
@@ -26,7 +26,7 @@ public class NeighborHandler implements Runnable{
            HashMap<Integer, PeerWorker> unchokedPeers = this.vitals.getUnchokedPeers();
            Vector<PeerWorker> newNeighbors = new Vector<PeerWorker>();
            HashMap<Integer, PeerWorker> interestedPeers = this.vitals.getInterestedWorkers();
-           if (!interestedPeers.isEmpty()) {
+           if (!interestedPeers.isEmpty() && checkIfAllConnected()) {
                int iter = Math.min(this.vitals.getNumPreferredNeighbors(), interestedPeers.size());
                if (checkIfCompletedFile()) {
                    for (int i = 0; i < iter; i++) {
@@ -84,6 +84,17 @@ public class NeighborHandler implements Runnable{
         return 0.0;
     }
 
+    public boolean checkIfAllConnected() {
+        Vector<Peer> listOfPeers = this.vitals.getListOfPeers();
+        for (Peer peer : listOfPeers) {
+            if (this.vitals.getThisPeer().getPeerId() != peer.getPeerId()) {
+                if (!this.mapOfWorkers.containsKey(peer.getPeerId())) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 
 
     public boolean checkIfCompletedFile() {
