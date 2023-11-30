@@ -286,7 +286,15 @@ public class PeerWorker implements Runnable{
 
         // Check if all peers are done
         if (this.vitals.areAllPeersComplete()) {
-            this.peerManager.terminate();
+            try
+            {
+                Thread.sleep(3000);
+                this.peerManager.terminate();
+            }
+            catch (InterruptedException e)
+            {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -416,6 +424,7 @@ public class PeerWorker implements Runnable{
         if (this.vitals.areAllPeersComplete()) {
             try
             {
+                Thread.sleep(3000);
                 this.peerManager.terminate();
             }
             catch (Exception e) {}
