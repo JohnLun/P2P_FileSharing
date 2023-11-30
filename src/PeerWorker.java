@@ -314,6 +314,10 @@ public class PeerWorker implements Runnable{
     }
 
     public void sendRequestMessage() {
+        if (this.isChoked || !this.isInterested) {
+            return;
+        }
+
         // Check if the last request piece was successful. If unsuccessful, reset the bitfield index to false
         if (!this.lastRequestedPieceSuccessful && this.lastRequestedPieceIndex != -1) {
             this.vitals.getBitSet().set(this.lastRequestedPieceIndex, false);

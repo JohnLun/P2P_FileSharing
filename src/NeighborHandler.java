@@ -112,11 +112,15 @@ public class NeighborHandler implements Runnable{
 
 
     public boolean checkIfCompletedFile() {
-        for (int i = 0; i < vitals.getBitSet().length(); i++) {
-            if (!vitals.getBitSet().get(i)) {
-                return false;
-            }
+        if (this.vitals.getBitSet().cardinality() != this.vitals.getNumPiecesInFile()) {
+            return false;
         }
         return true;
+//        for (int i = 0; i < vitals.getBitSet().length(); i++) {
+//            if (!vitals.getBitSet().get(i)) {
+//                return false;
+//            }
+//        }
+//        return true;
     }
 }

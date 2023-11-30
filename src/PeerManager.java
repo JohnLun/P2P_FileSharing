@@ -36,8 +36,8 @@ public class PeerManager {
             this.listener = new ServerSocket(this.vitals.getPort(this.peerId));
             this.optimisticallyUnchokedNeighborHandler = new OptimisticallyUnchokedNeighborHandler(this.vitals);
             this.neighborHandler = new NeighborHandler(this.vitals, this.optimisticallyUnchokedNeighborHandler);
-            this.scheduler1.scheduleAtFixedRate(this.neighborHandler, 6, this.vitals.getUnchokingInterval(), TimeUnit.SECONDS);
-            this.scheduler2.scheduleAtFixedRate(this.optimisticallyUnchokedNeighborHandler, 6, this.vitals.getOptimisticallyUnchokedInterval(), TimeUnit.SECONDS);
+            this.scheduler1.scheduleAtFixedRate(this.neighborHandler, 1, this.vitals.getUnchokingInterval(), TimeUnit.SECONDS);
+            this.scheduler2.scheduleAtFixedRate(this.optimisticallyUnchokedNeighborHandler, 1, this.vitals.getOptimisticallyUnchokedInterval(), TimeUnit.SECONDS);
             this.runPeerConnectionHandler();
         } catch (IOException e) {
             e.printStackTrace();
