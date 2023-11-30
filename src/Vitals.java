@@ -9,7 +9,7 @@ import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Vitals {
-    private CommonConfigHelper commonConfigHelper;
+    private volatile CommonConfigHelper commonConfigHelper;
     private PeerInfoConfigHelper peerInfoConfigHelper;
     private HashMap<Integer, Peer> mapOfPeers;
     private HashMap<Integer, PeerWorker> mapOfWorkers;
@@ -289,7 +289,7 @@ public class Vitals {
     }
 
     public void sortDownloadRates() {
-        Iterator iter = mapOfPeers.entrySet().iterator();
+        Iterator iter = mapOfWorkers.entrySet().iterator();
         while (iter.hasNext()) {
             Map.Entry peerEntry = (Map.Entry)iter.next();
             mapOfDownloadRates.put((int)peerEntry.getKey(), ((PeerWorker)peerEntry.getValue()).getDownloadRate());

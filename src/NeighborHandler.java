@@ -105,6 +105,7 @@ public class NeighborHandler implements Runnable{
     }
 
     public void convertVectorOfPeers(Vector<PeerWorker> newNeighbors) {
+        this.preferredNeighbors.clear();
         for (PeerWorker neighbor : newNeighbors) {
             this.preferredNeighbors.add(this.vitals.getPeer(neighbor.getPeerId()));
         }
