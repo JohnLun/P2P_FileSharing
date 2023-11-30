@@ -39,7 +39,7 @@ public class NeighborHandler implements Runnable{
                    for (int i = 0; i < iter; i++) {
                        int randomIndex = ThreadLocalRandom.current().nextInt(0, iter);
                        PeerWorker nextPeer = this.vitals.getWorker(interestedPeerIds.get(randomIndex));
-                       while (this.vitals.getThisPeerId() == nextPeer.getPeerId()) {
+                       while (this.vitals.getThisPeerId() == nextPeer.getNeighborPeerId()) {
                            randomIndex = ThreadLocalRandom.current().nextInt(0, iter);
                            nextPeer = this.vitals.getWorker(interestedPeerIds.get(randomIndex));
                        }

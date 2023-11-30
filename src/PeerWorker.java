@@ -456,7 +456,8 @@ public class PeerWorker implements Runnable{
         return this.downloadRate;
     }
 
-
-
+    public int getNeighborPeerId() {
+        return this.neighborPeerId;
+    }
 }
 
