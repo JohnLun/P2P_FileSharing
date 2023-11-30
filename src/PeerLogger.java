@@ -25,6 +25,11 @@ public class PeerLogger {
         }
     }
 
+    //TODO: extraneous log not part of spec but part of TA's requirements
+    public void settingVariables (CommonConfigHelper configHelper, Peer me)
+    {
+        logger.info(loggerHelper.loggingSetVariables(configHelper, me));
+    }
     public void toTcpConnection(int neighborId) {
         logger.info(loggerHelper.makeTcpConnectionLog(neighborId));
     }

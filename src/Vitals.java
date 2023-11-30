@@ -72,9 +72,8 @@ public class Vitals {
         if (this.peer.hasEntireFile()) {
             this.bitfield.set(0, numPiecesInFile, true);
             this.numPiecesDownloaded = this.numPiecesInFile;
-
-            // If our peer has the entire file according to the config, read the file into our data array
             this.readEntireFile(this.commonConfigHelper.getFileName());
+            // If our peer has the entire file according to the config, read the file into our data array
         }
         else {
             this.numPiecesDownloaded = 0;
@@ -247,6 +246,8 @@ public class Vitals {
     public PeerLogger getPeerLogger() {
         return this.peerLogger;
     }
+
+    public CommonConfigHelper getCommonConfigHelper() {return this.commonConfigHelper; }
 
     /// Setters ////////////////////////////////////////////////////////////////////////////////////////////////////////
 

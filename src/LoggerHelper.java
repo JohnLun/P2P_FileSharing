@@ -86,4 +86,14 @@ public class LoggerHelper {
         String returnVal = "[" + now + "]: Peer [" + this.peerId + "] has downloaded the complete file.";
         return returnVal;
     }
+
+    //TODO Note this is extraneous - just to TA's specs, not the actual proj specs
+    public String loggingSetVariables(CommonConfigHelper configHelper, Peer me) {
+        String now = dtf.format(LocalDateTime.now());
+        String returnVal = "[" + now + "]: Peer [" + this.peerId + "] has started with variables: NumberOfPreferred Neighbors - "
+                + configHelper.getNumPreferredNeighbors() + " -- Unchoking Interval - " + configHelper.getUnchokingInterval() + " -- Optimistic Unchoking Interval - "
+                + configHelper.getOptimisticUnchokingInterval() + " -- File Name - " + configHelper.getFileName() + " -- File Size - " + configHelper.getFileSize()
+                + " -- Piece Size - " + configHelper.getPieceSize() + " --- and has bitfield filled with " + (me.hasEntireFile() ? "1" : "0") + "'s.";
+        return returnVal;
+    }
 }
