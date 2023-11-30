@@ -7,12 +7,14 @@ public class NeighborHandler implements Runnable{
     private Vector<Peer> preferredNeighbors;
     private OptimisticallyUnchokedNeighborHandler optimisticallyUnchokedNeighborHandler;
     private HashMap<Integer, PeerWorker> mapOfWorkers;
+    private PeerLogger peerLogger;
 
     public NeighborHandler(Vitals vitals, OptimisticallyUnchokedNeighborHandler optimisticallyUnchokedNeighborHandler) {
         this.vitals = vitals;
-        this.preferredNeighbors = this.vitals.getPreferredNeighbors();
+        this.preferredNeighbors = new Vector<>();
         this.mapOfWorkers = this.vitals.getMapOfWorkers();
         this.optimisticallyUnchokedNeighborHandler = optimisticallyUnchokedNeighborHandler;
+        this.peerLogger = vitals.getPeerLogger();
     }
 
     public void run() {
@@ -76,6 +78,11 @@ public class NeighborHandler implements Runnable{
                    }
                }
            }
+           convertVectorOfPeers(newNeighbors);
+           this.vitals.setPreferredNeighbors(this.preferredNeighbors);
+           if (newNeighbors.size() > 0) {
+               this.peerLogger.changePreferredNeighbors();
+           }
        } catch (Exception e) {
             e.printStackTrace();
        }
@@ -95,6 +102,12 @@ public class NeighborHandler implements Runnable{
             }
         }
         return true;
+    }
+
+    public void convertVectorOfPeers(Vector<PeerWorker> newNeighbors) {
+        for (PeerWorker neighbor : newNeighbors) {
+            this.preferredNeighbors.add(this.vitals.getPeer(neighbor.getPeerId()));
+        }
     }
 
 

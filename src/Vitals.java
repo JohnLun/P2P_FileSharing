@@ -107,12 +107,14 @@ public class Vitals {
     public void createPreferredNeighbors() {
         int randomNum = 0;
         Vector<Peer> listOfPeers = peerInfoConfigHelper.getListOfPeers();
+        HashSet<Integer> visited = new HashSet<>();
         int k = commonConfigHelper.getNumPreferredNeighbors();
         for(int i = 0; i < k; i++) {
-            while(listOfPeers.get(randomNum).getPeerId() != this.peer.getPeerId()) {
+            while(listOfPeers.get(randomNum).getPeerId() != this.peer.getPeerId() && !visited.contains(randomNum)) {
                 randomNum = ThreadLocalRandom.current().nextInt(0, listOfPeers.size());
             }
             this.preferredNeighbors.add(listOfPeers.get(randomNum));
+            visited.add(randomNum);
         }
     }
 
@@ -325,6 +327,9 @@ public class Vitals {
         for (Map.Entry<Integer,PeerWorker> entry : this.mapOfWorkers.entrySet())
             System.out.println("Key = " + entry.getKey() +
                     ", Value = " + entry.getValue().getPeerId());
+    }
+    public void setPreferredNeighbors(Vector<Peer> preferredNeighbors) {
+        this.preferredNeighbors = preferredNeighbors;
     }
 
     public void setOptimisticallyUnchokedPeer(Integer peerId) {
