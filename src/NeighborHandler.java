@@ -33,7 +33,7 @@ public class NeighborHandler implements Runnable{
                if (checkIfCompletedFile()) {
                    for (int i = 0; i < iter; i++) {
                        Random random = new Random();
-                       PeerWorker nextPeer = interestedPeers.get(random.nextInt(interestedPeers.size()));
+                       PeerWorker nextPeer = interestedPeers.get(random.nextInt(iter)+1001);
                        while (this.vitals.getThisPeerId() != nextPeer.getPeerId()) {
                            random = new Random();
                            nextPeer = interestedPeers.get(random.nextInt(interestedPeers.size()));
