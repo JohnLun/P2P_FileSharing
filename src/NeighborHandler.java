@@ -32,7 +32,7 @@ public class NeighborHandler implements Runnable{
                    for (int i = 0; i < iter; i++) {
                        Random random = new Random();
                        PeerWorker nextPeer = interestedPeers.get(random.nextInt(interestedPeers.size()));
-                       while (newNeighbors.equals(nextPeer)) {
+                       while (this.vitals.getThisPeerId() != nextPeer.getPeerId()) {
                            random = new Random();
                            nextPeer = interestedPeers.get(random.nextInt(interestedPeers.size()));
                        }
@@ -43,6 +43,7 @@ public class NeighborHandler implements Runnable{
                        }
 
                        newNeighbors.add(nextPeer);
+                       interestedPeers.remove(nextPeer.getPeerId());
 
                        nextPeer.setDownloadRate(0.0);
                    }
@@ -60,7 +61,7 @@ public class NeighborHandler implements Runnable{
                        } else {
                            this.vitals.getUnchokedPeers().remove(ent.getKey());
                        }
-                       newNeighbors.add(ent.getKey(), this.vitals.getWorker(ent.getKey()));
+                       newNeighbors.add(this.vitals.getWorker(ent.getKey()));
                        nextPeer.setDownloadRate(0.0);
                        counter++;
                    }
