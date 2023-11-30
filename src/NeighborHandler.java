@@ -28,15 +28,20 @@ public class NeighborHandler implements Runnable{
            HashMap<Integer, PeerWorker> unchokedPeers = this.vitals.getUnchokedPeers();
            Vector<PeerWorker> newNeighbors = new Vector<PeerWorker>();
            HashMap<Integer, PeerWorker> interestedPeers = this.vitals.getInterestedWorkers();
+           Vector<Integer> interestedPeerIds = new Vector<>();
+           for (Map.Entry<Integer, PeerWorker> entry : interestedPeers.entrySet()) {
+               interestedPeerIds.add(entry.getKey());
+           }
            if (!interestedPeers.isEmpty() && checkIfAllConnected()) {
                int iter = Math.min(this.vitals.getNumPreferredNeighbors(), interestedPeers.size());
                if (checkIfCompletedFile()) {
                    for (int i = 0; i < iter; i++) {
                        Random random = new Random();
-                       PeerWorker nextPeer = interestedPeers.get(random.nextInt(iter-1)+1001);
+                       int randomIndex = random.nextInt(iter-1);
+                       PeerWorker nextPeer = this.vitals.getWorker(interestedPeerIds.get(randomIndex));
                        while (this.vitals.getThisPeerId() == nextPeer.getPeerId()) {
-                           random = new Random();
-                           nextPeer = interestedPeers.get(random.nextInt(interestedPeers.size()));
+                           randomIndex = random.nextInt(iter-1);
+                           nextPeer = this.vitals.getWorker(interestedPeerIds.get(randomIndex));
                        }
                        if (!unchokedPeers.containsKey(nextPeer.getPeerId()) && nextPeer.getPeerId() != this.optimisticallyUnchokedNeighborHandler.getOptUnchokedId()) {
                            nextPeer.sendUnchokeMessage();
@@ -46,7 +51,7 @@ public class NeighborHandler implements Runnable{
 
                        newNeighbors.add(nextPeer);
                        interestedPeers.remove(nextPeer.getPeerId());
-
+                       interestedPeerIds.remove(randomIndex);
                        nextPeer.setDownloadRate(0.0);
                    }
                } else {
