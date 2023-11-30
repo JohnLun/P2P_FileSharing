@@ -404,7 +404,7 @@ public class PeerWorker implements Runnable{
 
         // Put data in vitals (and therefore this peer)
         this.vitals.putPiece(pieceIndex, pieceData);
-        this.downloadRate++;
+        this.vitals.updateDownloadRates(this.neighborPeerId);
 
         this.lastRequestedPieceSuccessful = true;
 

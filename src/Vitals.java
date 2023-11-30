@@ -343,6 +343,10 @@ public class Vitals {
         this.optimisticallyUnchokedPeerId = peerId; //set optimisticallyUnchokedPeerId
     }
 
+    public void updateDownloadRates(int neighborPeerId) {
+        this.mapOfDownloadRates.put(neighborPeerId, this.mapOfDownloadRates.get(neighborPeerId) + 1);
+    }
+
     // Method to get the current optimistically unchoked peer
     public Integer getOptimisticallyUnchokedPeer() {
         return this.optimisticallyUnchokedPeerId;
