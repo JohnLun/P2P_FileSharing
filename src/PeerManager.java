@@ -58,8 +58,9 @@ public class PeerManager {
         for (Peer peer:this.vitals.getListOfPeers()) {
             int peerId = peer.getPeerId();
 
+            // THE VITALS.GETMAPOFWORKERS THING IS DONE TO MAKE SURE WORKER RUNNING BEFORE SEND HAVE MESSAGE
             // There is no worker where the key is this peer's peer id, so skip this peer id
-            if (peerId != this.peerId) {
+            if (peerId != this.peerId && vitals.getMapOfWorkers().containsKey(peerId)) {
                 this.vitals.getWorker(peerId).sendHaveMessage(piece);
             }
         }
