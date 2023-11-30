@@ -48,8 +48,6 @@ public class PeerWorker implements Runnable{
             this.resolveNeighborPeerId(neighborPeerIdOptional);
             this.logger = this.vitals.getPeerLogger();
             this.downloadRate = 0.0;
-
-            logger.settingVariables(this.vitals.getCommonConfigHelper(), this.vitals.getThisPeer());
         } catch (IOException e) {
             e.printStackTrace();
         }

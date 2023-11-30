@@ -25,6 +25,7 @@ public class PeerManager {
         this.peerInfoConfigHelper = new PeerInfoConfigHelper("PeerInfo.cfg");
         this.scheduler1 = Executors.newSingleThreadScheduledExecutor();
         this.scheduler2 = Executors.newSingleThreadScheduledExecutor();
+        //logger.settingVariables(this.vitals.getCommonConfigHelper(), this.vitals.getThisPeer());
     }
 
     public void run() {

@@ -61,6 +61,7 @@ public class Vitals {
         this.mapOfWorkers = new HashMap<>();
         this.peerLogger = new PeerLogger(this);
         this.initBitFieldAndData();
+        this.peerLogger.settingVariables(this.commonConfigHelper, this.peer);
     }
 
     // Create bitfield for this peer and the data array if this peer has the entire file
