@@ -39,6 +39,7 @@ public class NeighborHandler implements Runnable{
                    for (int i = 0; i < iter; i++) {
                        int randomIndex = ThreadLocalRandom.current().nextInt(0, iter);
                        PeerWorker nextPeer = this.vitals.getWorker(interestedPeerIds.get(randomIndex));
+                       // TODO: while loop is useless
                        while (this.vitals.getThisPeerId() == nextPeer.getNeighborPeerId()) {
                            randomIndex = ThreadLocalRandom.current().nextInt(0, iter);
                            nextPeer = this.vitals.getWorker(interestedPeerIds.get(randomIndex));
@@ -65,9 +66,8 @@ public class NeighborHandler implements Runnable{
                            if (!unchokedPeers.containsKey(ent.getKey()) && nextPeer.getNeighborPeerId() != this.optimisticallyUnchokedNeighborHandler.getOptUnchokedId()) {
                                nextPeer.sendUnchokeMessage();
                            }
-                       } else {
-                           this.vitals.getUnchokedPeers().remove(ent.getKey());
                        }
+
                        newNeighbors.add(this.vitals.getWorker(ent.getKey()));
                        nextPeer.setDownloadRate(0.0);
                        counter++;
