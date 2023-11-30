@@ -56,6 +56,7 @@ public class Vitals {
     private void initVitals() {
         this.mapOfPeers = peerInfoConfigHelper.getMapOfPeers();
         this.mapOfPeerBitfields = new HashMap<>();
+        initializeMapOfDownloadRates();
         this.peer = this.mapOfPeers.get(this.peerId);
         this.mapOfSockets = new HashMap<Integer, Socket>();
         this.mapOfWorkers = new HashMap<>();
@@ -290,13 +291,7 @@ public class Vitals {
     }
 
     public void sortDownloadRates() {
-        Iterator iter = mapOfWorkers.entrySet().iterator();
-        while (iter.hasNext()) {
-            Map.Entry peerEntry = (Map.Entry)iter.next();
-            mapOfDownloadRates.put((int)peerEntry.getKey(), ((PeerWorker)peerEntry.getValue()).getDownloadRate());
-        }
-
-        List<Map.Entry<Integer, Double>> list = new ArrayList<>(mapOfDownloadRates.entrySet());
+        List<Map.Entry<Integer, Double>> list = new ArrayList<>(this.mapOfDownloadRates.entrySet());
 
         // Sort the list based on values (in descending order)
         list.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
@@ -344,7 +339,16 @@ public class Vitals {
     }
 
     public void updateDownloadRates(int neighborPeerId) {
+
         this.mapOfDownloadRates.put(neighborPeerId, this.mapOfDownloadRates.get(neighborPeerId) + 1);
+    }
+
+    public void initializeMapOfDownloadRates() {
+        for (Peer peer : this.getListOfPeers()) {
+            if (peer.getPeerId() != this.peerId) {
+                this.mapOfDownloadRates.put(peer.getPeerId(), 0.0);
+            }
+        }
     }
 
     // Method to get the current optimistically unchoked peer
