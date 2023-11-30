@@ -36,7 +36,7 @@ public class NeighborHandler implements Runnable{
                            random = new Random();
                            nextPeer = interestedPeers.get(random.nextInt(interestedPeers.size()));
                        }
-                       if (!unchokedPeers.containsKey(nextPeer.getPeerId())) {
+                       if (!unchokedPeers.containsKey(nextPeer.getPeerId()) && nextPeer.getPeerId() != this.optimisticallyUnchokedNeighborHandler.getOptUnchokedId()) {
                            nextPeer.sendUnchokeMessage();
                        } else {
                            unchokedPeers.remove(nextPeer.getPeerId());
@@ -54,7 +54,7 @@ public class NeighborHandler implements Runnable{
                        Map.Entry<Integer, Double> ent = iterator.next();
                        PeerWorker nextPeer = this.vitals.getWorker(ent.getKey());
                        if (interestedPeers.containsKey(ent.getKey())) {
-                           if (!unchokedPeers.containsKey(ent.getKey()) || nextPeer.getPeerId() != this.optimisticallyUnchokedNeighborHandler.getOptUnchokedId()) {
+                           if (!unchokedPeers.containsKey(ent.getKey()) && nextPeer.getPeerId() != this.optimisticallyUnchokedNeighborHandler.getOptUnchokedId()) {
                                nextPeer.sendUnchokeMessage();
                            }
                        } else {
