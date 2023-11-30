@@ -427,7 +427,9 @@ public class PeerWorker implements Runnable{
                 Thread.sleep(3000);
                 this.peerManager.terminate();
             }
-            catch (Exception e) {}
+            catch (Exception e) {
+                e.printStackTrace();
+            }
 
         }
 
