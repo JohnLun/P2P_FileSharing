@@ -219,7 +219,7 @@ public class PeerWorker implements Runnable{
         this.isChoked = true;
 
         // If the last request was not completed before choking, set the bitfield value to false
-        if (!this.lastRequestedPieceSuccessful) {
+        if (!this.lastRequestedPieceSuccessful && this.lastRequestedPieceIndex != -1) {
             this.vitals.getBitSet().set(this.lastRequestedPieceIndex, false);
         }
         logger.choke(this.neighborPeerId);

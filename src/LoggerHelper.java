@@ -29,7 +29,11 @@ public class LoggerHelper {
     // TODO: data structure for preferred neighbors may be changed
     public String changePreferredNeighborsLog(Vector<Peer> preferredNeighbors) {
         String now = dtf.format(LocalDateTime.now());
-        String commaSeparatedList = preferredNeighbors.toString();
+        Vector<Integer> peerIds = new Vector<>();
+        for (Peer peer:preferredNeighbors) {
+            peerIds.add(peer.getPeerId());
+        }
+        String commaSeparatedList = peerIds.toString();
 
         String returnVal = "[" + now + "]: Peer [" + this.peerId + "] has the preferred neighbors " + commaSeparatedList + ".";
         return returnVal;
