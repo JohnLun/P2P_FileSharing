@@ -63,7 +63,7 @@ public class NeighborHandler implements Runnable{
                        Map.Entry<Integer, Double> ent = iterator.next();
                        PeerWorker nextPeer = this.vitals.getWorker(ent.getKey());
                        if (interestedPeers.containsKey(ent.getKey())) {
-                           if (!unchokedPeers.containsKey(ent.getKey())) {
+                           if (!unchokedPeers.containsKey(ent   .getKey())) {
                                nextPeer.sendUnchokeMessage();
                                PeerWorker tempWorker = this.vitals.getWorker(ent.getKey());
                                newNeighbors.put(tempWorker.getNeighborPeerId(), tempWorker);
@@ -77,8 +77,8 @@ public class NeighborHandler implements Runnable{
                    }
                }
                this.vitals.getUnchokedPeers().clear();
-               for (int i = 0; i < newNeighbors.size(); i++) {
-                   this.vitals.addToUnchoked(newNeighbors.get(i).getNeighborPeerId());
+               for(Map.Entry<Integer, PeerWorker> neighbor : newNeighbors.entrySet()) {
+                   this.vitals.addToUnchoked(neighbor.getKey());
                }
                for (Map.Entry<Integer, PeerWorker> worker : this.mapOfWorkers.entrySet()) {
                    if (!newNeighbors.containsKey(worker.getValue().getNeighborPeerId())) {
