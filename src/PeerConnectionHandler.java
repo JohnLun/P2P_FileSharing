@@ -7,11 +7,15 @@ import java.util.Vector;
 
 public class PeerConnectionHandler implements Runnable{
     private int peerId;
+    private boolean isAlive;
     private ServerSocket listener;
+    private PeerManager peerManager;
     private Vitals vitals;
-    public PeerConnectionHandler(int peerId, ServerSocket listener, Vitals vitals) {
+    public PeerConnectionHandler(int peerId, ServerSocket listener, PeerManager peerManager, Vitals vitals) {
         this.peerId = peerId;
+        this.isAlive = true;
         this.listener = listener;
+        this.peerManager = peerManager;
         this.vitals = vitals;
     }
 
@@ -27,14 +31,14 @@ public class PeerConnectionHandler implements Runnable{
     // Establish a connection with all peers before this one in the PeerConfig file
     private void connectToExistingNeighbors() {
         try {
-            Thread.sleep(5000);
+            Thread.sleep(8000);
             Vector<Peer> listOfPeers = vitals.getListOfPeers();
             for (Peer neighbor:listOfPeers) {
                 if (neighbor.getPeerId() == this.peerId) {
                     break;
                 }
                 Socket socket = new Socket(neighbor.getHostName(), neighbor.getPort());
-                PeerWorker peerWorker = new PeerWorker(vitals, socket, this.peerId, Optional.of(neighbor.getPeerId()));
+                PeerWorker peerWorker = new PeerWorker(peerManager, vitals, socket, this.peerId, Optional.of(neighbor.getPeerId()));
                 vitals.addSocketToMap(neighbor.getPeerId(), socket);
                 vitals.addWorkerToMap(neighbor.getPeerId(), peerWorker);
                 Thread thread = new Thread(peerWorker);
@@ -50,15 +54,21 @@ public class PeerConnectionHandler implements Runnable{
     // Since the neighborId is unknown, the map of sockets and map of workers will be updated within the worker thread, and NOT here
     private void listenForNewConnections() {
         try {
-            while (true) {
+            System.out.println("All previous peers connected to");
+            while (isAlive) {
+                System.out.println("listening for new connections");
                 Socket socket = this.listener.accept();
-                PeerWorker peerWorker = new PeerWorker(vitals, socket, this.peerId, Optional.empty());
+                PeerWorker peerWorker = new PeerWorker(peerManager, vitals, socket, this.peerId, Optional.empty());
                 Thread thread = new Thread(peerWorker);
                 thread.start();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            //TODO most exception prints stem from here
+            e.printStackTrace(); // most errors will come from here
         }
     }
 
+    public void kill() {
+        this.isAlive = false;
+    }
 }

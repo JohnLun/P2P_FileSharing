@@ -29,7 +29,11 @@ public class LoggerHelper {
     // TODO: data structure for preferred neighbors may be changed
     public String changePreferredNeighborsLog(Vector<Peer> preferredNeighbors) {
         String now = dtf.format(LocalDateTime.now());
-        String commaSeparatedList = preferredNeighbors.toString();
+        Vector<Integer> peerIds = new Vector<>();
+        for (Peer peer:preferredNeighbors) {
+            peerIds.add(peer.getPeerId());
+        }
+        String commaSeparatedList = peerIds.toString();
 
         String returnVal = "[" + now + "]: Peer [" + this.peerId + "] has the preferred neighbors " + commaSeparatedList + ".";
         return returnVal;
@@ -84,6 +88,16 @@ public class LoggerHelper {
     public String completionOfDownloadLog() {
         String now = dtf.format(LocalDateTime.now());
         String returnVal = "[" + now + "]: Peer [" + this.peerId + "] has downloaded the complete file.";
+        return returnVal;
+    }
+
+    //TODO Note this is extraneous - just to TA's specs, not the actual proj specs
+    public String loggingSetVariables(CommonConfigHelper configHelper, Peer me) {
+        String now = dtf.format(LocalDateTime.now());
+        String returnVal = "[" + now + "]: Peer [" + this.peerId + "] has started with variables: NumberOfPreferred Neighbors - "
+                + configHelper.getNumPreferredNeighbors() + " -- Unchoking Interval - " + configHelper.getUnchokingInterval() + " -- Optimistic Unchoking Interval - "
+                + configHelper.getOptimisticUnchokingInterval() + " -- File Name - " + configHelper.getFileName() + " -- File Size - " + configHelper.getFileSize()
+                + " -- Piece Size - " + configHelper.getPieceSize() + " --- and has bitfield filled with " + (me.hasEntireFile() ? "1" : "0") + "'s.";
         return returnVal;
     }
 }

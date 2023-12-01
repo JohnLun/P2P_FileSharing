@@ -5,12 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="189caa74-640d-4e1c-a2eb-6545870a7794" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/PeerProcess.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/LoggerHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/LoggerHelper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/PeerConnectionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/PeerConnectionHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/PeerInfoConfigHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/PeerInfoConfigHelper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/PeerManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/PeerManager.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/PeerWorker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/PeerWorker.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Vitals.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Vitals.java" afterDir="false" />
     </list>
@@ -27,6 +22,11 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="MarkdownSettingsMigration">
@@ -44,7 +44,11 @@
   "keyToString": {
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "last_opened_file_path": "C:/Rishi_Sajay/College/Fall 2023/Networking/P2P_FileSharing"
+    "WebServerToolWindowFactoryState": "false",
+    "last_opened_file_path": "C:/Rishi_Sajay/College/Fall 2023/Networking/P2P_FileSharing",
+    "node.js.detected.package.eslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)"
   }
 }]]></component>
   <component name="RunManager">
@@ -69,8 +73,13 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1698187177979</updated>
+      <workItem from="1700430570606" duration="7000" />
+      <workItem from="1700430590548" duration="5128000" />
     </task>
     <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
