@@ -65,12 +65,14 @@ public class NeighborHandler implements Runnable{
                        if (interestedPeers.containsKey(ent.getKey())) {
                            if (!unchokedPeers.containsKey(ent.getKey()) && nextPeer.getNeighborPeerId() != this.optimisticallyUnchokedNeighborHandler.getOptUnchokedId()) {
                                nextPeer.sendUnchokeMessage();
+                               newNeighbors.add(this.vitals.getWorker(ent.getKey()));
+                               counter++;
                            }
                        }
 
-                       newNeighbors.add(this.vitals.getWorker(ent.getKey()));
+
                        nextPeer.setDownloadRate(0.0);
-                       counter++;
+
                    }
                }
                this.vitals.getUnchokedPeers().clear();
