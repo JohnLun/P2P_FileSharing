@@ -31,7 +31,7 @@ public class PeerConnectionHandler implements Runnable{
     // Establish a connection with all peers before this one in the PeerConfig file
     private void connectToExistingNeighbors() {
         try {
-            Thread.sleep(5000);
+            Thread.sleep(0000);
             Vector<Peer> listOfPeers = vitals.getListOfPeers();
             for (Peer neighbor:listOfPeers) {
                 if (neighbor.getPeerId() == this.peerId) {

@@ -27,7 +27,7 @@ public class NeighborHandler implements Runnable{
        try {
            //empty
            HashMap<Integer, PeerWorker> unchokedPeers = this.vitals.getUnchokedPeers();
-           Vector<PeerWorker> newNeighbors = new Vector<PeerWorker>();
+           HashMap<Integer, PeerWorker> newNeighbors = new HashMap<>();
            HashMap<Integer, PeerWorker> interestedPeers = this.vitals.getInterestedWorkers();
            Vector<Integer> interestedPeerIds = new Vector<>();
            for (Map.Entry<Integer, PeerWorker> entry : interestedPeers.entrySet()) {
@@ -44,13 +44,13 @@ public class NeighborHandler implements Runnable{
                            randomIndex = ThreadLocalRandom.current().nextInt(0, iter);
                            nextPeer = this.vitals.getWorker(interestedPeerIds.get(randomIndex));
                        }
-                       if (!unchokedPeers.containsKey(nextPeer.getNeighborPeerId()) && nextPeer.getNeighborPeerId() != this.optimisticallyUnchokedNeighborHandler.getOptUnchokedId()) {
+                       if (!unchokedPeers.containsKey(nextPeer.getNeighborPeerId())) {
                            nextPeer.sendUnchokeMessage();
                        } else {
                            unchokedPeers.remove(nextPeer.getNeighborPeerId());
                        }
 
-                       newNeighbors.add(nextPeer);
+                       newNeighbors.put(nextPeer.getNeighborPeerId(), nextPeer);
                        interestedPeers.remove(nextPeer.getNeighborPeerId());
                        interestedPeerIds.remove(randomIndex);
                        nextPeer.setDownloadRate(0.0);
@@ -63,9 +63,10 @@ public class NeighborHandler implements Runnable{
                        Map.Entry<Integer, Double> ent = iterator.next();
                        PeerWorker nextPeer = this.vitals.getWorker(ent.getKey());
                        if (interestedPeers.containsKey(ent.getKey())) {
-                           if (!unchokedPeers.containsKey(ent.getKey()) && nextPeer.getNeighborPeerId() != this.optimisticallyUnchokedNeighborHandler.getOptUnchokedId()) {
+                           if (!unchokedPeers.containsKey(ent.getKey())) {
                                nextPeer.sendUnchokeMessage();
-                               newNeighbors.add(this.vitals.getWorker(ent.getKey()));
+                               PeerWorker tempWorker = this.vitals.getWorker(ent.getKey());
+                               newNeighbors.put(tempWorker.getNeighborPeerId(), tempWorker);
                                counter++;
                            }
                        }
@@ -80,7 +81,7 @@ public class NeighborHandler implements Runnable{
                    this.vitals.addToUnchoked(newNeighbors.get(i).getNeighborPeerId());
                }
                for (Map.Entry<Integer, PeerWorker> worker : this.mapOfWorkers.entrySet()) {
-                   if (!newNeighbors.contains(worker.getValue()) && worker.getValue().getNeighborPeerId() != this.optimisticallyUnchokedNeighborHandler.getOptUnchokedId()) {
+                   if (!newNeighbors.containsKey(worker.getValue().getNeighborPeerId())) {
                        if(!worker.getValue().getChoked()) {
                            worker.getValue().sendChokeMessage();
                        }
@@ -114,10 +115,10 @@ public class NeighborHandler implements Runnable{
         return true;
     }
 
-    public void convertVectorOfPeers(Vector<PeerWorker> newNeighbors) {
+    public void convertVectorOfPeers(HashMap<Integer, PeerWorker> newNeighbors) {
         this.preferredNeighbors.clear();
-        for (PeerWorker neighbor : newNeighbors) {
-            this.preferredNeighbors.add(this.vitals.getPeer(neighbor.getNeighborPeerId()));
+        for (Map.Entry<Integer, PeerWorker> neighbor: newNeighbors.entrySet()) {
+            this.preferredNeighbors.add(this.vitals.getPeer(neighbor.getKey()));
         }
     }
 

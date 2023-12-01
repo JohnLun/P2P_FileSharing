@@ -82,7 +82,7 @@ public class PeerWorker implements Runnable{
 
     private void runPeerWorker() {
         this.resolveHandshakes();
-        if (this.vitals.getThisPeer().hasEntireFile()) {
+        if (this.vitals.getBitSet().cardinality() > 0) {
             this.sendBitfieldMessage();
         }
         try {
