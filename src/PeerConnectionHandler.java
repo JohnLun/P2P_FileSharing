@@ -42,6 +42,7 @@ public class PeerConnectionHandler implements Runnable{
                 vitals.addSocketToMap(neighbor.getPeerId(), socket);
                 vitals.addWorkerToMap(neighbor.getPeerId(), peerWorker);
                 Thread thread = new Thread(peerWorker);
+                this.vitals.addToVectorOfWorkerThreads(thread);
                 thread.start();
             }
 
@@ -60,11 +61,11 @@ public class PeerConnectionHandler implements Runnable{
                 Socket socket = this.listener.accept();
                 PeerWorker peerWorker = new PeerWorker(peerManager, vitals, socket, this.peerId, Optional.empty());
                 Thread thread = new Thread(peerWorker);
+                this.vitals.addToVectorOfWorkerThreads(thread);
                 thread.start();
             }
         } catch (IOException e) {
-            //TODO most exception prints stem from here
-            e.printStackTrace(); // most errors will come from here
+            //e.printStackTrace(); // most errors will come from here
         }
     }
 

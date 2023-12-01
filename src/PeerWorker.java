@@ -95,8 +95,10 @@ public class PeerWorker implements Runnable{
                 byte messageType = actualMessage.getMessageType();
                 this.processActualMessage(actualMessage);
             }
+            this.in.close();
+            this.out.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
     }
 
@@ -220,7 +222,7 @@ public class PeerWorker implements Runnable{
             this.vitals.getBitSet().set(this.lastRequestedPieceIndex, false);
         }
 
-        // Since the last requested piece will never be delivered and the bitfield has been fixed, reset for next cycle
+        // Since the last requested piece will never be delivered (since it wasn't already) and the bitfield has been fixed, reset for next cycle
         this.lastRequestedPieceSuccessful = true;
         this.lastRequestedPieceIndex = -1;
 
@@ -240,8 +242,6 @@ public class PeerWorker implements Runnable{
         {
             this.sendRequestMessage();
         }
-        //this.sendRequestMessage();
-
     }
 
     public void sendInterestedMessage() {

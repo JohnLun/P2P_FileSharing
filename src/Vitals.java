@@ -12,6 +12,7 @@ public class Vitals {
     private volatile CommonConfigHelper commonConfigHelper;
     private PeerInfoConfigHelper peerInfoConfigHelper;
     private HashMap<Integer, Peer> mapOfPeers;
+    private Vector<Thread> vectorOfThreads;
     private HashMap<Integer, PeerWorker> mapOfWorkers;
 
     private LinkedHashMap<Integer, Double> mapOfDownloadRates;
@@ -36,7 +37,6 @@ public class Vitals {
     ///////////////////////////////////////////////////
     // Rishi stuff for PeerChokeHandler
     private HashSet<Integer> setOfInterestedPeers;
-    private int optUnchokedPeerId = -1;
 
 
     // Constructor
@@ -50,6 +50,7 @@ public class Vitals {
         this.mapOfDownloadRates = new LinkedHashMap<Integer, Double>();
         this.interestedPeers = new HashMap<Integer, PeerWorker>();
         this.unchokedPeers = new HashMap<Integer, PeerWorker>();
+        this.vectorOfThreads = new Vector<>();
         this.setOfInterestedPeers = new HashSet<>();
         this.initVitals();
     }
@@ -267,6 +268,10 @@ public class Vitals {
         return this.data;
     }
 
+    public Vector<Thread> getVectorOfWorkerThreads() {
+        return this.vectorOfThreads;
+    }
+
     /// Setters ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // Adds workers to hashmap as they are created
@@ -379,5 +384,9 @@ public class Vitals {
         if (this.setOfInterestedPeers.contains(neighborPeerId)) {
             this.setOfInterestedPeers.remove(neighborPeerId);
         }
+    }
+
+    public void addToVectorOfWorkerThreads(Thread thread) {
+        this.vectorOfThreads.add(thread);
     }
 }
