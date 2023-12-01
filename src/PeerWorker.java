@@ -471,5 +471,9 @@ public class PeerWorker implements Runnable{
     public int getNeighborPeerId() {
         return this.neighborPeerId;
     }
+
+    public boolean getChoked() {
+        return this.isChoked;
+    }
 }
 

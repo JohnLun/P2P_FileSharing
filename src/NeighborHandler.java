@@ -81,7 +81,10 @@ public class NeighborHandler implements Runnable{
                }
                for (Map.Entry<Integer, PeerWorker> worker : this.mapOfWorkers.entrySet()) {
                    if (!newNeighbors.contains(worker.getValue()) && worker.getValue().getNeighborPeerId() != this.optimisticallyUnchokedNeighborHandler.getOptUnchokedId()) {
-                       worker.getValue().sendChokeMessage();
+                       if(!worker.getValue().getChoked()) {
+                           worker.getValue().sendChokeMessage();
+                       }
+
                    }
                }
            }
