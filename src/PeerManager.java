@@ -21,6 +21,7 @@ public class PeerManager {
     private ScheduledExecutorService scheduler2;
     private PeerChokeHandler peerChokeHandler;
     private PeerOptUnchokeHandler peerOptUnchokeHandler;
+    private PeerConnectionHandler peerConnectionHandler;
 
     public PeerManager(int peerId) {
         this.peerId = peerId;
@@ -50,7 +51,7 @@ public class PeerManager {
     // Create and run peerConnectionHandler
     // This thread makes connections with already existing peers and listens for future connections
     private void runPeerConnectionHandler() {
-        PeerConnectionHandler peerConnectionHandler = new PeerConnectionHandler(this.peerId, listener, this, this.vitals);
+        this.peerConnectionHandler = new PeerConnectionHandler(this.peerId, listener, this, this.vitals);
         connectionHandlerThread = new Thread(peerConnectionHandler);
         connectionHandlerThread.start();
     }
@@ -60,17 +61,17 @@ public class PeerManager {
         for (Peer peer:this.vitals.getListOfPeers()) {
             int peerId = peer.getPeerId();
 
-            // THE VITALS.GETMAPOFWORKERS THING IS DONE TO MAKE SURE WORKER RUNNING BEFORE SEND HAVE MESSAGE
             // There is no worker where the key is this peer's peer id, so skip this peer id
+            // Make sure that the worker is running before we send a have message
             if (peerId != this.peerId && vitals.getMapOfWorkers().containsKey(peerId)) {
                 this.vitals.getWorker(peerId).sendHaveMessage(piece);
             }
         }
     }
 
-    public void terminate() {
+    public synchronized void terminate() {
         try {
-            //this.writeDownloadedData();
+            this.writeDownloadedData();
             // Signal all peer workers to stop
             for (Peer peer : vitals.getListOfPeers()) {
                 PeerWorker worker = vitals.getWorker(peer.getPeerId());
@@ -78,6 +79,8 @@ public class PeerManager {
                     worker.killWorker();
                 }
             }
+
+            this.peerConnectionHandler.kill();
 
             connectionHandlerThread.interrupt();
 
@@ -88,6 +91,14 @@ public class PeerManager {
 
             this.scheduler1.shutdownNow();
             this.scheduler2.shutdownNow();
+
+            for (Thread thread : this.vitals.getVectorOfWorkerThreads()) {
+                thread.interrupt();
+            }
+
+            System.out.println("The peer " + this.peerId + " terminated successfully.");
+
+            System.exit(0);
         } catch (IOException e) {
             e.printStackTrace();
         }

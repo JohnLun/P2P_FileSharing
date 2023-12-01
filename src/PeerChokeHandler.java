@@ -42,7 +42,6 @@ public class PeerChokeHandler implements Runnable{
         // If this peer does not have the entire file, choose preferred neighbors based on download rates
         else {
             LinkedHashMap<Integer, Double> mapOfDownloadRates = this.vitals.getMapOfDownloadRates();
-            //printMapOfDownloadRates(mapOfDownloadRates);
             Iterator<Map.Entry<Integer, Double>> iterator = mapOfDownloadRates.entrySet().iterator();
             int counter = 0;
             while (counter < numPreferredNeighbors && iterator.hasNext()) {
