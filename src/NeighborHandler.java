@@ -46,6 +46,8 @@ public class NeighborHandler implements Runnable{
                        }
                        if (!unchokedPeers.containsKey(nextPeer.getNeighborPeerId()) && nextPeer.getChoked()) {
                            nextPeer.sendUnchokeMessage();
+                       } else {
+                           unchokedPeers.remove(nextPeer.getNeighborPeerId());
                        }
                        newNeighbors.put(nextPeer.getNeighborPeerId(), nextPeer);
                        interestedPeers.remove(nextPeer.getNeighborPeerId());
@@ -65,6 +67,8 @@ public class NeighborHandler implements Runnable{
                                PeerWorker tempWorker = this.vitals.getWorker(ent.getKey());
                                newNeighbors.put(tempWorker.getNeighborPeerId(), tempWorker);
                                counter++;
+                           } else {
+                               unchokedPeers.remove(nextPeer.getNeighborPeerId());
                            }
                        }
 
