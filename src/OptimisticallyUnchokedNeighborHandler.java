@@ -31,7 +31,7 @@ public class OptimisticallyUnchokedNeighborHandler implements Runnable{
                 this.random = new Random();
                 PeerWorker selectedPeer = candidates.get(random.nextInt(candidates.size()));
                 selectedPeer.sendUnchokeMessage();
-                this.optUnchokedId = selectedPeer.getPeerId();
+                this.optUnchokedId = selectedPeer.getNeighborPeerId();
             }
 
         } catch (Exception e) {

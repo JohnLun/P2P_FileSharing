@@ -54,7 +54,7 @@ public class PeerConnectionHandler implements Runnable{
     // Since the neighborId is unknown, the map of sockets and map of workers will be updated within the worker thread, and NOT here
     private void listenForNewConnections() {
         try {
-            System.out.println("Checking for incoming connections");
+            System.out.println("All previous peers connected to");
             while (isAlive) {
                 System.out.println("listening for new connections");
                 Socket socket = this.listener.accept();

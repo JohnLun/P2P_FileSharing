@@ -219,6 +219,11 @@ public class PeerWorker implements Runnable{
         if (!this.lastRequestedPieceSuccessful && this.lastRequestedPieceIndex != -1) {
             this.vitals.getBitSet().set(this.lastRequestedPieceIndex, false);
         }
+
+        // Since the last requested piece will never be delivered and the bitfield has been fixed, reset for next cycle
+        this.lastRequestedPieceSuccessful = true;
+        this.lastRequestedPieceIndex = -1;
+
         logger.choke(this.neighborPeerId);
     }
 
@@ -235,6 +240,7 @@ public class PeerWorker implements Runnable{
         {
             this.sendRequestMessage();
         }
+        //this.sendRequestMessage();
 
     }
 
@@ -246,6 +252,7 @@ public class PeerWorker implements Runnable{
     // When this message is received, it means that the neighbor is interested
     public void processInterestedMessage(ActualMessage actualMessage) {
         this.vitals.addToInterested(this.neighborPeerId);
+        this.vitals.addToSetOfInterestedPeers(this.neighborPeerId);
         this.neighborIsInterested = true;
         logger.receiveInterested(this.neighborPeerId);
     }
@@ -258,6 +265,7 @@ public class PeerWorker implements Runnable{
     // When this message is received, it means that the neighbor is not interested
     public void processNotInterestedMessage(ActualMessage actualMessage) {
         this.vitals.removeFromInterested(this.neighborPeerId);
+        this.vitals.removeFromSetOfInterestedPeers(this.neighborPeerId);
         this.neighborIsInterested = false;
         logger.receiveNotInterested(this.neighborPeerId);
     }
@@ -474,6 +482,10 @@ public class PeerWorker implements Runnable{
 
     public boolean getChoked() {
         return this.isChoked;
+    }
+
+    public boolean isNeighborChoked() {
+        return this.neighborIsChoked;
     }
 }
 
