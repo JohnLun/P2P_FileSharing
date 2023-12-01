@@ -33,7 +33,10 @@ public class Vitals {
 
     private Integer optimisticallyUnchokedPeerId = null; // Field to store the ID of the current optimistically unchoked peer
 
-
+    ///////////////////////////////////////////////////
+    // Rishi stuff for PeerChokeHandler
+    private HashSet<Integer> setOfInterestedPeers;
+    private int optUnchokedPeerId = -1;
 
 
     // Constructor
@@ -45,9 +48,10 @@ public class Vitals {
         preferredNeighbors = new Vector<Peer>();
         data = new byte[commonConfigHelper.getFileSize()];
         this.mapOfDownloadRates = new LinkedHashMap<Integer, Double>();
-        this.initVitals();
         this.interestedPeers = new HashMap<Integer, PeerWorker>();
         this.unchokedPeers = new HashMap<Integer, PeerWorker>();
+        this.setOfInterestedPeers = new HashSet<>();
+        this.initVitals();
     }
 
     // Content Functions ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -251,6 +255,18 @@ public class Vitals {
 
     public CommonConfigHelper getCommonConfigHelper() {return this.commonConfigHelper; }
 
+    public HashSet<Integer> getSetOfInterestedPeers() {
+        return this.setOfInterestedPeers;
+    }
+
+    public int getOptimisticallyUnchokedPeerId() {
+        return this.optimisticallyUnchokedPeerId;
+    }
+
+    public byte[] getData() {
+        return this.data;
+    }
+
     /// Setters ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // Adds workers to hashmap as they are created
@@ -343,6 +359,10 @@ public class Vitals {
         this.mapOfDownloadRates.put(neighborPeerId, this.mapOfDownloadRates.get(neighborPeerId) + 1);
     }
 
+    public void resetDownloadRates() {
+        this.initializeMapOfDownloadRates();
+    }
+
     public void initializeMapOfDownloadRates() {
         for (Peer peer : this.getListOfPeers()) {
             if (peer.getPeerId() != this.peerId) {
@@ -351,8 +371,13 @@ public class Vitals {
         }
     }
 
-    // Method to get the current optimistically unchoked peer
-    public Integer getOptimisticallyUnchokedPeer() {
-        return this.optimisticallyUnchokedPeerId;
+    public void addToSetOfInterestedPeers(int neighborPeerId) {
+        this.setOfInterestedPeers.add(neighborPeerId);
+    }
+
+    public void removeFromSetOfInterestedPeers(int neighborPeerId) {
+        if (this.setOfInterestedPeers.contains(neighborPeerId)) {
+            this.setOfInterestedPeers.remove(neighborPeerId);
+        }
     }
 }

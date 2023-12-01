@@ -1,6 +1,9 @@
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -16,8 +19,8 @@ public class PeerManager {
     private Thread connectionHandlerThread;
     private ScheduledExecutorService scheduler1;
     private ScheduledExecutorService scheduler2;
-    private NeighborHandler neighborHandler;
-    private OptimisticallyUnchokedNeighborHandler optimisticallyUnchokedNeighborHandler;
+    private PeerChokeHandler peerChokeHandler;
+    private PeerOptUnchokeHandler peerOptUnchokeHandler;
 
     public PeerManager(int peerId) {
         this.peerId = peerId;
@@ -25,7 +28,6 @@ public class PeerManager {
         this.peerInfoConfigHelper = new PeerInfoConfigHelper("PeerInfo.cfg");
         this.scheduler1 = Executors.newSingleThreadScheduledExecutor();
         this.scheduler2 = Executors.newSingleThreadScheduledExecutor();
-        //logger.settingVariables(this.vitals.getCommonConfigHelper(), this.vitals.getThisPeer());
     }
 
     public void run() {
@@ -35,10 +37,10 @@ public class PeerManager {
         try {
             this.vitals = new Vitals(peerId, this.commonConfigHelper, this.peerInfoConfigHelper, this.listener);
             this.listener = new ServerSocket(this.vitals.getPort(this.peerId));
-            //this.optimisticallyUnchokedNeighborHandler = new OptimisticallyUnchokedNeighborHandler(this.vitals);
-            this.neighborHandler = new NeighborHandler(this.vitals, this.optimisticallyUnchokedNeighborHandler);
-            this.scheduler1.scheduleAtFixedRate(this.neighborHandler, 1, this.vitals.getUnchokingInterval(), TimeUnit.SECONDS);
-            //this.scheduler2.scheduleAtFixedRate(this.optimisticallyUnchokedNeighborHandler, 1, this.vitals.getOptimisticallyUnchokedInterval(), TimeUnit.SECONDS);
+            this.peerChokeHandler = new PeerChokeHandler(this.vitals);
+            this.peerOptUnchokeHandler = new PeerOptUnchokeHandler(this.vitals);
+            this.scheduler1.scheduleAtFixedRate(this.peerChokeHandler, 1, this.vitals.getUnchokingInterval(), TimeUnit.SECONDS);
+            this.scheduler2.scheduleAtFixedRate(this.peerOptUnchokeHandler, 1, this.vitals.getOptimisticallyUnchokedInterval(), TimeUnit.SECONDS);
             this.runPeerConnectionHandler();
         } catch (IOException e) {
             e.printStackTrace();
@@ -68,6 +70,7 @@ public class PeerManager {
 
     public void terminate() {
         try {
+            //this.writeDownloadedData();
             // Signal all peer workers to stop
             for (Peer peer : vitals.getListOfPeers()) {
                 PeerWorker worker = vitals.getWorker(peer.getPeerId());
@@ -85,6 +88,15 @@ public class PeerManager {
 
             this.scheduler1.shutdownNow();
             this.scheduler2.shutdownNow();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void writeDownloadedData() {
+        try {
+            Path path = Paths.get("downloadedFile");
+            Files.write(path, this.vitals.getData());
         } catch (IOException e) {
             e.printStackTrace();
         }
