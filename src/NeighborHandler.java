@@ -52,7 +52,6 @@ public class NeighborHandler implements Runnable{
                        newNeighbors.put(nextPeer.getNeighborPeerId(), nextPeer);
                        interestedPeers.remove(nextPeer.getNeighborPeerId());
                        interestedPeerIds.remove(randomIndex);
-                       nextPeer.setDownloadRate(0.0);
                    }
                } else {
                    LinkedHashMap<Integer, Double> mapOfDownloadRates = this.vitals.getMapOfDownloadRates();
@@ -71,10 +70,6 @@ public class NeighborHandler implements Runnable{
                                unchokedPeers.remove(nextPeer.getNeighborPeerId());
                            }
                        }
-
-
-                       nextPeer.setDownloadRate(0.0);
-
                    }
                }
                this.vitals.getUnchokedPeers().clear();
@@ -89,12 +84,14 @@ public class NeighborHandler implements Runnable{
 
                    }
                }
+
            }
            convertVectorOfPeers(newNeighbors);
            this.vitals.setPreferredNeighbors(this.preferredNeighbors);
            if (newNeighbors.size() > 0) {
                this.peerLogger.changePreferredNeighbors();
            }
+           this.vitals.resetMapOfDownloadRates();
        } catch (Exception e) {
             e.printStackTrace();
        }
