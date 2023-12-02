@@ -37,9 +37,15 @@ In the main directory (P2P_Filesharing), move to the directory "src"
 
 Within src, place your designated files (Common.cfg, InfoPeer.cfg) along with the file you intend to send.
 
-To compile all .java files in the "src" directory, run "javac *.java" within this directory
+To compile all .java files in the "src" directory, run within this directory:
+```
+javac *.java
+```
 
-To run the program, use the command "java peerProcess [this_peer_id]"
+To run the program, use the command 
+```
+java peerProcess [this_peer_id]
+```
 
 
 
