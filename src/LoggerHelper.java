@@ -100,4 +100,10 @@ public class LoggerHelper {
                 + " -- Piece Size - " + configHelper.getPieceSize() + " --- and has bitfield filled with " + (me.hasEntireFile() ? "1" : "0") + "'s.";
         return returnVal;
     }
+
+    public String allPeersCompleted() {
+        String now = dtf.format(LocalDateTime.now());
+        String returnVal = "[" + now + "]: All peers have downloaded the complete file.";
+        return returnVal;
+    }
 }

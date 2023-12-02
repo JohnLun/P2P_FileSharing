@@ -9,7 +9,7 @@ import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Vitals {
-    private volatile CommonConfigHelper commonConfigHelper;
+    private CommonConfigHelper commonConfigHelper;
     private PeerInfoConfigHelper peerInfoConfigHelper;
     private HashMap<Integer, Peer> mapOfPeers;
     private Vector<Thread> vectorOfThreads;
@@ -21,7 +21,7 @@ public class Vitals {
     private HashMap<Integer, Socket> mapOfSockets;
     public HashMap<Integer, BitSet> mapOfPeerBitfields; // Map of bitfields for all peers, including this one
     private Peer peer;
-    private BitSet bitfield;
+    private volatile BitSet bitfield;
     private int peerId;
     private int numPiecesInFile;
     private int numPiecesDownloaded;
@@ -30,7 +30,7 @@ public class Vitals {
     private PeerLogger peerLogger;
     private byte[] data;
 
-    private volatile boolean shouldTerminate = false;
+    private boolean shouldTerminate = false;
 
     private Integer optimisticallyUnchokedPeerId = null; // Field to store the ID of the current optimistically unchoked peer
 
@@ -388,5 +388,21 @@ public class Vitals {
 
     public void addToVectorOfWorkerThreads(Thread thread) {
         this.vectorOfThreads.add(thread);
+    }
+
+    public BitSet getPeerBitfield(int peerId) {
+        return  this.mapOfPeerBitfields.get(peerId);
+    }
+
+    public synchronized void updateThisBitfield(int pieceId, boolean value) {
+        if (pieceId >= 0) {
+            this.bitfield.set(pieceId, value);
+        }
+    }
+
+    public synchronized void updateMapOfPeerBitfields(int peerId, int pieceId) {
+        if (pieceId >= 0) {
+            this.mapOfPeerBitfields.get(peerId).set(pieceId);
+        }
     }
 }

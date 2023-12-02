@@ -137,7 +137,7 @@ public class PeerWorker implements Runnable{
     }
 
     // Send handshake message to neighbor
-    public synchronized void sendHandshakeMessage() {
+    public void sendHandshakeMessage() {
         try {
             byte[] msgToSend = MessageCreator.createHandshakeMessage(this.peerId);
             this.out.write(msgToSend);
@@ -219,7 +219,8 @@ public class PeerWorker implements Runnable{
 
         // If the last request was not completed before choking, set the bitfield value to false
         if (!this.lastRequestedPieceSuccessful && this.lastRequestedPieceIndex != -1) {
-            this.vitals.getBitSet().set(this.lastRequestedPieceIndex, false);
+            this.vitals.updateThisBitfield(this.lastRequestedPieceIndex, false);
+            //this.vitals.getBitSet().set(this.lastRequestedPieceIndex, false);
         }
 
         // Since the last requested piece will never be delivered (since it wasn't already) and the bitfield has been fixed, reset for next cycle
@@ -281,7 +282,8 @@ public class PeerWorker implements Runnable{
         int pieceIndex = ByteBuffer.wrap(actualMessage.getMessagePayload()).getInt();
 
         // Update the pieces to choose from, since the neighbor is signalling that it has a new piece
-        this.vitals.mapOfPeerBitfields.get(this.neighborPeerId).set(pieceIndex);
+        //this.vitals.mapOfPeerBitfields.get(this.neighborPeerId).set(pieceIndex);
+        this.vitals.updateMapOfPeerBitfields(this.neighborPeerId, pieceIndex);
 
         logger.receiveHave(this.neighborPeerId, pieceIndex);
 
@@ -337,9 +339,12 @@ public class PeerWorker implements Runnable{
             return;
         }
 
+        // TODO: might be bad
         // Check if the last request piece was successful. If unsuccessful, reset the bitfield index to false
         if (!this.lastRequestedPieceSuccessful && this.lastRequestedPieceIndex != -1) {
-            this.vitals.getBitSet().set(this.lastRequestedPieceIndex, false);
+            //this.vitals.getBitSet().set(this.lastRequestedPieceIndex, false);
+            this.vitals.updateThisBitfield(this.lastRequestedPieceIndex, false);
+            //return;
         }
 
         int index = this.chooseIndexForRequestMessage();
@@ -351,7 +356,8 @@ public class PeerWorker implements Runnable{
         }
 
         // Set the piece here and not when the piece is received, so that other threads do not request the same piece
-        this.vitals.getBitSet().set(index);
+        //this.vitals.getBitSet().set(index);
+        this.vitals.updateThisBitfield(index, true);
         this.lastRequestedPieceIndex = index;
         this.lastRequestedPieceSuccessful = false;
 
@@ -395,6 +401,10 @@ public class PeerWorker implements Runnable{
     }
 
     public void sendPieceMessage(int pieceIndex) {
+        // TODO: added this, might be bad
+        if (this.neighborIsChoked) {
+            return;
+        }
         if (pieceIndex >= this.vitals.getNumPiecesInFile()) {
             throw new IllegalArgumentException("The requested piece index to be sent is out of bounds.");
         }
@@ -414,8 +424,9 @@ public class PeerWorker implements Runnable{
         }
 
         if (this.lastRequestedPieceIndex != pieceIndex) {
-            throw new IllegalArgumentException("The piece index " + this.lastRequestedPieceIndex + " was last requested " +
-                    "but the index " + pieceIndex + " was received");
+//            throw new IllegalArgumentException("The piece index " + this.lastRequestedPieceIndex + " was last requested " +
+//                    "but the index " + pieceIndex + " was received");
+            this.peerManager.sendHaveMessageToAllNeighbors(this.lastRequestedPieceIndex);
         }
 
         // Put data in vitals (and therefore this peer)

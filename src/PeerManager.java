@@ -40,8 +40,8 @@ public class PeerManager {
             this.listener = new ServerSocket(this.vitals.getPort(this.peerId));
             this.peerChokeHandler = new PeerChokeHandler(this.vitals);
             this.peerOptUnchokeHandler = new PeerOptUnchokeHandler(this.vitals);
-            this.scheduler1.scheduleAtFixedRate(this.peerChokeHandler, 1, this.vitals.getUnchokingInterval(), TimeUnit.SECONDS);
-            this.scheduler2.scheduleAtFixedRate(this.peerOptUnchokeHandler, 1, this.vitals.getOptimisticallyUnchokedInterval(), TimeUnit.SECONDS);
+            this.scheduler1.scheduleAtFixedRate(this.peerChokeHandler, 6, this.vitals.getUnchokingInterval(), TimeUnit.SECONDS);
+            this.scheduler2.scheduleAtFixedRate(this.peerOptUnchokeHandler, 6, this.vitals.getOptimisticallyUnchokedInterval(), TimeUnit.SECONDS);
             this.runPeerConnectionHandler();
         } catch (IOException e) {
             e.printStackTrace();
@@ -72,6 +72,7 @@ public class PeerManager {
     public synchronized void terminate() {
         try {
             this.writeDownloadedData();
+            this.vitals.getPeerLogger().allPeersCompleted();
             // Signal all peer workers to stop
             for (Peer peer : vitals.getListOfPeers()) {
                 PeerWorker worker = vitals.getWorker(peer.getPeerId());
@@ -106,7 +107,7 @@ public class PeerManager {
 
     public void writeDownloadedData() {
         try {
-            Path path = Paths.get("downloadedFile");
+            Path path = Paths.get("downloadedFile.jpg");
             Files.write(path, this.vitals.getData());
         } catch (IOException e) {
             e.printStackTrace();
