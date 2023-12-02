@@ -17,7 +17,7 @@ Rishi Sajay -
 
 John Lun - Worked on preferred neighbor + optimistically unchoked handeling, logging, termination of program. Helped with the majority of debugging.
 
-Chase Wrenn - 
+Chase Wrenn - Focus on implementing methods relating to processing messages. Also implemented OptimisticallyUnchokedNeighbor functionality, assisted with terminating application, and functionality relating to recognizing neighbors recieved files.
 
 Max LoGalbo - Max was able to initiate debugging testing of the overall program, ensuring Linux connections from local PC's were working and helping out with overall debugging techniques.
 
