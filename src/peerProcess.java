@@ -1,8 +1,6 @@
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
-import java.util.BitSet;
 
-public class PeerProcess {
+public class peerProcess {
     public static void main(String[] args) {
         if (args.length == 1) {
             try {

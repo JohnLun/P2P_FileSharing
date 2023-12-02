@@ -35,7 +35,7 @@ public class PeerLogger {
     {
         logger.info(loggerHelper.loggingSetVariables(configHelper, me));
     }
-    public void toTcpConnection(int neighborId) {
+    public  void toTcpConnection(int neighborId) {
         logger.info(loggerHelper.makeTcpConnectionLog(neighborId));
     }
 
@@ -49,6 +49,10 @@ public class PeerLogger {
 
     public void changeOptUnchokedNeighbor(int neighborId) {
         logger.info(loggerHelper.changeOptimisticallyUnchokedNeighborLog(neighborId));
+    }
+
+    public synchronized void noOptUnchokedNeighbor() {
+        logger.info(loggerHelper.noOptimisticallyUnchokedNeighborLog());
     }
 
     public void unchoke(int neighborId) {

@@ -40,8 +40,8 @@ public class PeerManager {
             this.listener = new ServerSocket(this.vitals.getPort(this.peerId));
             this.peerChokeHandler = new PeerChokeHandler(this.vitals);
             this.peerOptUnchokeHandler = new PeerOptUnchokeHandler(this.vitals);
-            this.scheduler1.scheduleAtFixedRate(this.peerChokeHandler, 6, this.vitals.getUnchokingInterval(), TimeUnit.SECONDS);
             this.scheduler2.scheduleAtFixedRate(this.peerOptUnchokeHandler, 6, this.vitals.getOptimisticallyUnchokedInterval(), TimeUnit.SECONDS);
+            this.scheduler1.scheduleAtFixedRate(this.peerChokeHandler, 6, this.vitals.getUnchokingInterval(), TimeUnit.SECONDS);
             this.runPeerConnectionHandler();
         } catch (IOException e) {
             e.printStackTrace();
@@ -105,9 +105,10 @@ public class PeerManager {
         }
     }
 
-    public void writeDownloadedData() {
+    public synchronized void writeDownloadedData() {
         try {
-            Path path = Paths.get("downloadedFile.jpg");
+            Files.createDirectories(Paths.get("Peer_" + this.peerId));
+            Path path = Paths.get("Peer_" + this.peerId + "/downloadedFile.jpg");
             Files.write(path, this.vitals.getData());
         } catch (IOException e) {
             e.printStackTrace();

@@ -75,8 +75,9 @@ public class PeerChokeHandler implements Runnable{
     private void sendChokeMessages(HashSet<Integer> newPreferredNeighbors) {
         // Choke every neighbor that isn't in our newPreferredNeighbors set
         for (Peer peer : this.vitals.getListOfPeers()) {
-            // Ignore this peer and neighbors that are new preferred neighbors
-            if (peer.getPeerId() == this.vitals.getThisPeerId() || newPreferredNeighbors.contains(peer.getPeerId())) {
+            // Ignore this peer and neighbors that are new preferred neighbors and opt unchoked peer
+            if (peer.getPeerId() == this.vitals.getThisPeerId() || newPreferredNeighbors.contains(peer.getPeerId())
+                    || peer.getPeerId() == this.vitals.getOptimisticallyUnchokedPeerId()) {
                 continue;
             }
 

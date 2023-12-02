@@ -353,9 +353,15 @@ public class Vitals {
     public void setOptimisticallyUnchokedPeer(Integer peerId) {
         if ((this.optimisticallyUnchokedPeerId == null && peerId != null) ||
                 (this.optimisticallyUnchokedPeerId != null && !this.optimisticallyUnchokedPeerId.equals(peerId))) {
-            this.peerLogger.changeOptUnchokedNeighbor(getThisPeerId()); //if it changes, send log
+            this.peerLogger.changeOptUnchokedNeighbor(peerId); //if it changes, send log
         }
-
+//        if (peerId == -1) {
+//            this.peerLogger.noOptUnchokedNeighbor();
+//        }
+//        else {
+//            this.peerLogger.changeOptUnchokedNeighbor(peerId);
+//        }
+//        this.peerLogger.changeOptUnchokedNeighbor(peerId);
         this.optimisticallyUnchokedPeerId = peerId; //set optimisticallyUnchokedPeerId
     }
 

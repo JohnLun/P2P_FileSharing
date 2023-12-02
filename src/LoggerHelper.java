@@ -45,6 +45,12 @@ public class LoggerHelper {
         return returnVal;
     }
 
+    public String noOptimisticallyUnchokedNeighborLog() {
+        String now = dtf.format(LocalDateTime.now());
+        String returnVal = "[" + now + "]: Peer [" + this.peerId + "] has no optimistically unchoked neighbor, since no choked neighbor is interested in its data right now.";
+        return returnVal;
+    }
+
     public String getUnchokedLog(int neighborPeerId) {
         String now = dtf.format(LocalDateTime.now());
         String returnVal = "[" + now + "]: Peer [" + this.peerId + "] is unchoked by  [" + neighborPeerId + "].";
