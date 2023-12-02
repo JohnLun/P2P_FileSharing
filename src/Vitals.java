@@ -330,6 +330,10 @@ public class Vitals {
         return this.mapOfDownloadRates;
     }
 
+    public void resetMapOfDownloadRates() {
+        initializeMapOfDownloadRates();
+    }
+
     public void setUnchokedPeers(HashMap<Integer, PeerWorker> unchokedPeers) {
         this.unchokedPeers = unchokedPeers;
     }

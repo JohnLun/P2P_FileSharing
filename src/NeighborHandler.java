@@ -44,16 +44,14 @@ public class NeighborHandler implements Runnable{
                            randomIndex = ThreadLocalRandom.current().nextInt(0, iter);
                            nextPeer = this.vitals.getWorker(interestedPeerIds.get(randomIndex));
                        }
-                       if (!unchokedPeers.containsKey(nextPeer.getNeighborPeerId())) {
+                       if (!unchokedPeers.containsKey(nextPeer.getNeighborPeerId()) && nextPeer.getChoked()) {
                            nextPeer.sendUnchokeMessage();
                        } else {
                            unchokedPeers.remove(nextPeer.getNeighborPeerId());
                        }
-
                        newNeighbors.put(nextPeer.getNeighborPeerId(), nextPeer);
                        interestedPeers.remove(nextPeer.getNeighborPeerId());
                        interestedPeerIds.remove(randomIndex);
-                       nextPeer.setDownloadRate(0.0);
                    }
                } else {
                    LinkedHashMap<Integer, Double> mapOfDownloadRates = this.vitals.getMapOfDownloadRates();
@@ -63,17 +61,15 @@ public class NeighborHandler implements Runnable{
                        Map.Entry<Integer, Double> ent = iterator.next();
                        PeerWorker nextPeer = this.vitals.getWorker(ent.getKey());
                        if (interestedPeers.containsKey(ent.getKey())) {
-                           if (!unchokedPeers.containsKey(ent   .getKey())) {
+                           if (!unchokedPeers.containsKey(ent.getKey()) && nextPeer.getChoked()) {
                                nextPeer.sendUnchokeMessage();
                                PeerWorker tempWorker = this.vitals.getWorker(ent.getKey());
                                newNeighbors.put(tempWorker.getNeighborPeerId(), tempWorker);
                                counter++;
+                           } else {
+                               unchokedPeers.remove(nextPeer.getNeighborPeerId());
                            }
                        }
-
-
-                       nextPeer.setDownloadRate(0.0);
-
                    }
                }
                this.vitals.getUnchokedPeers().clear();
@@ -88,12 +84,14 @@ public class NeighborHandler implements Runnable{
 
                    }
                }
+
            }
            convertVectorOfPeers(newNeighbors);
            this.vitals.setPreferredNeighbors(this.preferredNeighbors);
            if (newNeighbors.size() > 0) {
                this.peerLogger.changePreferredNeighbors();
            }
+           this.vitals.resetMapOfDownloadRates();
        } catch (Exception e) {
             e.printStackTrace();
        }
