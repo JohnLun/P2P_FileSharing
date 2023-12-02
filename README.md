@@ -15,7 +15,7 @@ The following program initiates a Peer-to-Peer connection with X  neighbors who 
 
 Rishi Sajay - 
 
-John Lun - 
+John Lun - Worked on preferred neighbor + optimistically unchoked handeling, logging, termination of program. Helped with the majority of debugging.
 
 Chase Wrenn - 
 
