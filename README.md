@@ -24,10 +24,13 @@ Max LoGalbo - Max was able to initiate debugging testing of the overall program,
 
 ## Demo Link
 
-INSERT DEMO LINK
+https://youtu.be/Y99G2nNWmFE
 
 Please note - we were able to achieve all requirements detailed within the description of the project.
 
+## Github Link
+
+https://github.com/JohnLun/P2P_FileSharing
 
 ## How to Run
 
