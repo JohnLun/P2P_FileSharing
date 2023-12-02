@@ -1,7 +1,7 @@
 # P2P_FileSharing - Group 12
  Rishi Sajay (rishisajay@ufl.edu)
  
- John Lun (jlun@ufl.edu) 
+ Jonathan Lun (jlun@ufl.edu) 
 
  Chase Wrenn (chasewrenn@ufl.edu)
 
