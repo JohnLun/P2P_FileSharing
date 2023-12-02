@@ -13,7 +13,7 @@ The following program initiates a Peer-to-Peer connection with X  neighbors who 
 
 ## Contributions
 
-Rishi Sajay - 
+Rishi Sajay - Worked on majority of the code (Manager class, Worker class, Config helpers, Logger helper, ConnectionHandler, Vitals class). Worked on main communication loop, exchanging pieces and messages, running threads, etc. Worked on majority of the debugging. 
 
 John Lun - Worked on preferred neighbor + optimistically unchoked handeling, logging, termination of program. Helped with the majority of debugging.
 
