@@ -35,17 +35,19 @@ Once the zipped file is downloaded, import the unzipped folder into a Linux mach
 
 In the main directory (P2P_Filesharing), move to the directory "src"
 
-Within src, place your designated files (Common.cfg, InfoPeer.cfg) along with the file you intend to send.
+Within src, place your designated files (Common.cfg, PeerInfo.cfg) along with the file you intend to send.
 
 To compile all .java files in the "src" directory, run within this directory:
 ```
 javac *.java
 ```
 
-To run the program, use the command 
+To run the program on any Linux computer, use the command 
 ```
 java peerProcess [this_peer_id]
 ```
+
+Ensure this command is ran once on every peer specified in PeerInfo.cfg, as the processes will not fully terminate until all peers specified in PeerInfo.cfg have the file in their possession.
 
 
 
