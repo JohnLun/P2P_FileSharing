@@ -5,9 +5,11 @@ import java.util.Vector;
 
 public class PeerOptUnchokeHandler implements Runnable{
     private Vitals vitals;
+    private PeerLogger peerLogger;
 
     public PeerOptUnchokeHandler(Vitals vitals) {
         this.vitals = vitals;
+        this.peerLogger = this.vitals.getPeerLogger();
     }
 
     public void run() {
@@ -28,6 +30,7 @@ public class PeerOptUnchokeHandler implements Runnable{
         }
 
         // If the random neighbor peer id is -1, there is no possible optimistically unchoked neighbor
+        // If there is a valid opt unchoked neighbor, log it and send an unchoke message
         if (randomInterestedNeighbor != -1) {
             this.vitals.getWorker(randomInterestedNeighbor).sendUnchokeMessage();
         }

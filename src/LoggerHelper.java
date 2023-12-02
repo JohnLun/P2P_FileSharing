@@ -45,6 +45,12 @@ public class LoggerHelper {
         return returnVal;
     }
 
+    public String noOptimisticallyUnchokedNeighborLog() {
+        String now = dtf.format(LocalDateTime.now());
+        String returnVal = "[" + now + "]: Peer [" + this.peerId + "] has no optimistically unchoked neighbor, since no choked neighbor is interested in its data right now.";
+        return returnVal;
+    }
+
     public String getUnchokedLog(int neighborPeerId) {
         String now = dtf.format(LocalDateTime.now());
         String returnVal = "[" + now + "]: Peer [" + this.peerId + "] is unchoked by  [" + neighborPeerId + "].";
@@ -98,6 +104,12 @@ public class LoggerHelper {
                 + configHelper.getNumPreferredNeighbors() + " -- Unchoking Interval - " + configHelper.getUnchokingInterval() + " -- Optimistic Unchoking Interval - "
                 + configHelper.getOptimisticUnchokingInterval() + " -- File Name - " + configHelper.getFileName() + " -- File Size - " + configHelper.getFileSize()
                 + " -- Piece Size - " + configHelper.getPieceSize() + " --- and has bitfield filled with " + (me.hasEntireFile() ? "1" : "0") + "'s.";
+        return returnVal;
+    }
+
+    public String allPeersCompleted() {
+        String now = dtf.format(LocalDateTime.now());
+        String returnVal = "[" + now + "]: All peers have downloaded the complete file.";
         return returnVal;
     }
 }
